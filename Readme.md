@@ -11,7 +11,8 @@ general remeshing scheme. Also includes physically conservative voxelization
 
 As described in 
 [Powell & Abel (2015)](http://www.sciencedirect.com/science/article/pii/S0021999115003563) and
-[LA-UR-15-26964](https://raw.githubusercontent.com/devonmpowell/r3d/master/la-ur-15-26964.pdf).
+[LA-UR-15-26964](la-ur-15-26964.pdf). For information about the API itself, see
+[LA-UR-15-26964](la-ur-15-26964.pdf).
 
 ---
 
@@ -28,7 +29,7 @@ As described in
 - Utility functions for orientation tests, box initialization, conversion between polyhedral
   representations, and more.
 
-- A rigorous unit-testing framework, located in `tests`. These tests also serve as examples of how to
+- A set of rigorous unit-tests, located in `tests`. These tests also serve as examples of how to
   use `r3d`. 
 
 - All declarations and documentation are located in `r3d.h` and `r2d.h`.
@@ -60,12 +61,11 @@ Copyright (C) 2015, DOE and Los Alamos National Security, LLC.
 
 Contents of `deprecated` Copyright (C) 2015, The Board of Trustees of the Leland Stanford Junior University, 
 through SLAC National Accelerator Laboratory (subject to receipt of any required approvals 
-from the U.S. Dept. of Energy) 
+from the U.S. Dept. of Energy). 
 
 See source file headers for full license text. All code is open-source, subject to terms of the
 respective license. We request that you cite 
 [Powell & Abel (2015)](http://www.sciencedirect.com/science/article/pii/S0021999115003563) and
-[LA-UR-15-26964](https://raw.githubusercontent.com/devonmpowell/r3d/master/la-ur-15-26964.pdf) when
-using this code for research purposes.
+[LA-UR-15-26964](la-ur-15-26964.pdf) when using this code for research purposes.
 
 
