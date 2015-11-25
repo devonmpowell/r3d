@@ -702,6 +702,63 @@ void test_torus_load_and_chop() {
 	}
 }
 
+void test_voxelization() {
+
+	// Test r3d_voxelize() by checking that the voxelized moments
+	// do indeed sum to those of the original input
+
+#include "v3d.h"
+#define POLY_ORDER 4
+#define NGRID 23
+
+	// vars
+	r3d_int i, j, k, v, curorder, mind;
+	r3d_long gg; 
+	r3d_int nmom = R3D_NUM_MOMENTS(POLY_ORDER);
+	r3d_real voxsum, tmom[nmom];
+	r3d_poly poly;
+	r3d_rvec3 verts[4];
+
+	// create a random tet in the unit box
+	rand_tet_3d(verts, MIN_VOL);
+	for(v = 0; v < 4; ++v)
+	for(i = 0; i < 3; ++i) {
+		verts[v].xyz[i] += 1.0;
+		verts[v].xyz[i] *= 0.5;
+	}
+	r3d_init_tet(&poly, verts);
+
+	// get its original moments for reference
+	r3d_reduce(&poly, tmom, POLY_ORDER);
+
+	// voxelize it
+	r3d_rvec3 dx = {1.0/NGRID, 1.0/NGRID, 1.0/NGRID};
+	r3d_dvec3 ibox[2];
+	r3d_get_ibox(&poly, ibox, dx);
+	printf("Voxelizing a tetrahedron to a grid with dx = %f %f %f and moments of order %d\n", dx.x, dx.y, dx.z, POLY_ORDER);
+	printf("Minimum index box = %d %d %d to %d %d %d\n", ibox[0].i, ibox[0].j, ibox[0].k, ibox[1].i, ibox[1].j, ibox[1].k);
+	r3d_int nvoxels = (ibox[1].i-ibox[0].i)*(ibox[1].j-ibox[0].j)*(ibox[1].k-ibox[0].k);
+	r3d_real* grid = calloc(nvoxels*nmom, sizeof(r3d_real));
+	r3d_voxelize(&poly, ibox, grid, dx, POLY_ORDER);
+	
+	// make sure the sum of each moment equals the original 
+	for(curorder = 0, mind = 0; curorder <= POLY_ORDER; ++curorder) {
+		//printf("Order = %d\n", curorder);
+		for(i = curorder; i >= 0; --i)
+		for(j = curorder - i; j >= 0; --j, ++mind) {
+			k = curorder - i - j;
+			voxsum = 0.0;
+			for(gg = 0; gg < nvoxels; ++gg) voxsum += grid[nmom*gg+mind];
+			//printf(" Int[ x^%d y^%d z^%d dV ] original = %.10e, voxsum = %.10e, error = %.10e\n", 
+					//i, j, k, tmom[mind], voxsum, fabs(1.0 - tmom[mind]/voxsum));
+			ASSERT_EQ(tmom[mind], voxsum, TOL_FAIL);
+			EXPECT_EQ(tmom[mind], voxsum, TOL_WARN);
+		}
+	}
+	free(grid);
+}
+
+
 void test_moments() {
 
 	// check the moments against an analytic test case
@@ -764,6 +821,7 @@ void register_all_tests() {
 	register_test(test_tet_tet_timing, "tet_tet_timing");
 	register_test(test_torus_load_and_chop, "torus_load_and_chop");
 	register_test(test_moments, "moments");
+	register_test(test_voxelization, "voxelization");
 
 }
 
