@@ -43,9 +43,10 @@ typedef double r3d_real;
 #endif
 
 /**
- * \brief Integer type used for indexing
+ * \brief Integer types used for indexing
  */
 typedef int32_t r3d_int;
+typedef int64_t r3d_long;
 
 /** \struct r3d_rvec3
  *  \brief A 3-vector.
