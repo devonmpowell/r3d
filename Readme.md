@@ -1,9 +1,5 @@
 # `r3d`
 
----
-
-## About:
-
 Routines for fast, geometrically robust clipping operations and analytic volume/moment computations 
 over polytopes in 2D and 3D (as well as experimental ND). This software forms the kernel for an exact 
 general remeshing scheme. Also includes physically conservative voxelization 
