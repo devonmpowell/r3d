@@ -6,7 +6,7 @@
  *		polyhedra to a regular Cartesian grid using r3d. 
  *		
  *		Devon Powell
- *		31 August 2015
+ *		15 October 2015
  *
  *		Copyright (c) 2015, The Board of Trustees of the Leland Stanford Junior University, 
  *		through SLAC National Accelerator Laboratory (subject to receipt of any required approvals 
@@ -51,7 +51,7 @@
 /**
  * \file v3d.h
  * \author Devon Powell
- * \date 31 August 2015
+ * \date 15 October 2015
  * \brief Interface for r3d voxelization routines
  */
 
