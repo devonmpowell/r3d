@@ -22,7 +22,7 @@ lives in `deprecated`.
 [Koehl (2012)](https://www.computer.org/csdl/trans/tp/2012/11/ttp2012112158.pdf).
 
 - Voxelize 3D polyhedra onto a Cartesian grid by calculating the exact coordinate moments
-  of the intersections between the tetrahedron and each underlying grid cell.
+  of the intersections between the polyhedron and each underlying grid cell.
 
 - Utility functions for orientation tests, box initialization, conversion between polyhedral
   representations, and more.
@@ -57,9 +57,8 @@ or
 `r3d.c`, `r3d.h`, `r2d.c`, `r2d.h`, `rNd.c`, `rNd.h`, and contents of `tests` 
 Copyright (C) 2015, DOE and Los Alamos National Security, LLC.
 
-`v3d.c`, `v3d.h`, and contents of `deprecated` Copyright (C) 2015, The Board of Trustees of the Leland Stanford Junior University, 
-through SLAC National Accelerator Laboratory (subject to receipt of any required approvals 
-from the U.S. Dept. of Energy). 
+`v3d.c`, `v3d.h`, and contents of `deprecated` Copyright (C) 2015, Stanford University, 
+through SLAC National Accelerator Laboratory.
 
 See source file headers for full license text. All code is open-source, subject to terms of the
 respective license. We request that you cite 
