@@ -129,7 +129,7 @@ void r3d_split(r3d_poly* inpoly, r3d_poly** outpolys, r3d_real coord, r3d_int ax
 	if(inpoly->nverts <= 0) return;
 	r3d_int* nverts = &inpoly->nverts;
 	r3d_vertex* vertbuffer = inpoly->verts; 
-	r3d_int v, np, npnxt, onv, vcur, vnext, vstart, pnext, nright;
+	r3d_int v, np, npnxt, onv, vcur, vnext, vstart, pnext, nright, cside;
 	r3d_rvec3 newpos;
 	r3d_int side[R3D_MAX_VERTS];
 	r3d_real sdists[R3D_MAX_VERTS];
@@ -203,9 +203,11 @@ void r3d_split(r3d_poly* inpoly, r3d_poly** outpolys, r3d_real coord, r3d_int ax
 	outpolys[0]->nverts = 0;
 	outpolys[1]->nverts = 0;
 	for(v = 0; v < onv; ++v) {
-		outpolys[side[v]]->verts[outpolys[side[v]]->nverts] = vertbuffer[v];
-		side[v] = (outpolys[side[v]]->nverts)++;
+		cside = side[v];
+		outpolys[cside]->verts[outpolys[cside]->nverts] = vertbuffer[v];
+		side[v] = (outpolys[cside]->nverts)++;
 	}
+
 	for(v = 0; v < outpolys[0]->nverts; ++v) 
 		for(np = 0; np < 3; ++np)
 			outpolys[0]->verts[v].pnbrs[np] = side[outpolys[0]->verts[v].pnbrs[np]];
