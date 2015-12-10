@@ -532,6 +532,63 @@ void test_random_verts() {
 	}
 }
 
+void test_rasterization() {
+
+	// Test r2d_rasterize() by checking that the rasterized moments
+	// do indeed sum to those of the original input
+
+#include "v2d.h"
+#define POLY_ORDER 3
+#define NGRID 17
+
+	// vars
+	r2d_int i, j, v, curorder, mind;
+	r2d_long gg; 
+	r2d_int nmom = R2D_NUM_MOMENTS(POLY_ORDER);
+	r2d_real voxsum, tmom[nmom];
+	r2d_poly poly;
+	r2d_rvec2 verts[4];
+
+	// create a random tet in the unit box
+	rand_tri_2d(verts, MIN_AREA);
+	for(v = 0; v < 4; ++v)
+	for(i = 0; i < 2; ++i) {
+		verts[v].xy[i] += 1.0;
+		verts[v].xy[i] *= 0.5;
+	}
+	r2d_init_poly(&poly, verts, 3);
+
+	// get its original moments for reference
+	r2d_reduce(&poly, tmom, POLY_ORDER);
+
+	// rasterize it
+	r2d_rvec2 dx = {1.0/NGRID, 1.0/NGRID};
+	r2d_dvec2 ibox[2];
+	r2d_get_ibox(&poly, ibox, dx);
+	printf("Rasterizing a tetrahedron to a grid with dx = %f %f and moments of order %d\n", dx.x, dx.y, POLY_ORDER);
+	printf("Minimum index box = %d %d to %d %d\n", ibox[0].i, ibox[0].j, ibox[1].i, ibox[1].j);
+	r2d_int npix = (ibox[1].i-ibox[0].i)*(ibox[1].j-ibox[0].j);
+	r2d_real* grid = calloc(npix*nmom, sizeof(r2d_real));
+	r2d_rasterize(&poly, ibox, grid, dx, POLY_ORDER);
+	
+	// make sure the sum of each moment equals the original 
+	for(curorder = 0, mind = 0; curorder <= POLY_ORDER; ++curorder) {
+		//printf("Order = %d\n", curorder);
+		for(i = curorder; i >= 0; --i, ++mind) {
+			j = curorder - i;
+			voxsum = 0.0;
+			for(gg = 0; gg < npix; ++gg) voxsum += grid[nmom*gg+mind];
+			//printf(" Int[ x^%d y^%d dV ] original = %.10e, voxsum = %.10e, error = %.10e\n", 
+					//i, j, tmom[mind], voxsum, fabs(1.0 - tmom[mind]/voxsum));
+			ASSERT_EQ(tmom[mind], voxsum, TOL_FAIL);
+			EXPECT_EQ(tmom[mind], voxsum, TOL_WARN);
+		}
+	}
+	free(grid);
+}
+
+
+
 
 void test_moments() {
 
@@ -582,6 +639,7 @@ void register_all_tests() {
 	register_test(test_recursive_splitting_degenerate_perturbed, "recursive_splitting_degenerate_perturbed");
 	register_test(test_tri_tri_timing, "test_tri_tri_timing");
 	register_test(test_random_verts, "random_verts");
+	register_test(test_rasterization, "rasterization");
 	register_test(test_moments, "moments");
 
 }

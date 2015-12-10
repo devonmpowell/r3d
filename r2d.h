@@ -43,9 +43,10 @@ typedef double r2d_real;
 #endif
 
 /**
- * \brief Integer type used for indexing
+ * \brief Integer types used for indexing
  */
 typedef int32_t r2d_int;
+typedef int64_t r2d_long;
 
 /** \struct r2d_rvec2
  *  \brief A 2-vector.
@@ -58,6 +59,16 @@ typedef union {
 	r2d_real xy[2]; /*!< Index-based access to components. */
 } r2d_rvec2;
 
+/** \struct r2d_dvec2
+ *  \brief An integer 2-vector for grid indexing.
+ */
+typedef union {
+	struct {
+		r2d_int i, /*!< \f$x\f$-component. */
+				j; /*!< \f$y\f$-component. */
+	};
+	r2d_int ij[2]; /*!< Index-based access to components. */
+} r2d_dvec2;
 
 /** \struct r2d_plane
  *  \brief A plane.
