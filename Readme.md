@@ -3,7 +3,7 @@
 Routines for fast, geometrically robust clipping operations and analytic volume/moment computations 
 over polytopes in 2D and 3D (as well as experimental ND). This software forms the kernel for an exact 
 general remeshing scheme. Also includes physically conservative voxelization 
-(volume sampling) of 3D polyhedra to a Cartesian grid.
+(volume sampling) of polytopes to a Cartesian grid in 2D and 3D.
 
 As described in 
 [Powell & Abel (2015)](http://www.sciencedirect.com/science/article/pii/S0021999115003563) and
@@ -21,8 +21,8 @@ lives in `deprecated`.
 - Compute volumes and moments over polytopes using the optimal recursive method of
 [Koehl (2012)](https://www.computer.org/csdl/trans/tp/2012/11/ttp2012112158.pdf).
 
-- Voxelize 3D polyhedra onto a Cartesian grid by calculating the exact coordinate moments
-  of the intersections between the polyhedron and each underlying grid cell.
+- Voxelize 2D and 3D polytopes onto a Cartesian grid by calculating the exact coordinate moments
+  of the intersections between the polytope and each underlying grid cell.
 
 - Utility functions for orientation tests, box initialization, conversion between polyhedral
   representations, and more.
@@ -30,7 +30,7 @@ lives in `deprecated`.
 - A set of rigorous unit-tests, located in `tests`. These tests also serve as examples of how to
   use `r3d`. 
 
-- All declarations and documentation are located in `r3d.h`, `v3d.h`, and `r2d.h`.
+- All declarations and documentation are located in `r3d.h`, `v3d.h`, `r2d.h`, and `v2d.h`.
 
 ---
 
@@ -42,9 +42,7 @@ lives in `deprecated`.
 
 - To compile into your code,
 
-`#include <r3d.h>`
-or
-`#include <r2d.h>`
+`#include <r3d.h>`, `#include <r2d.h>`, `#include <v3d.h>`, `#include <v2d.h>` as you require.
 
 - To link,
 
@@ -57,7 +55,7 @@ or
 `r3d.c`, `r3d.h`, `r2d.c`, `r2d.h`, `rNd.c`, `rNd.h`, and contents of `tests` 
 Copyright (C) 2015, DOE and Los Alamos National Security, LLC.
 
-`v3d.c`, `v3d.h`, and contents of `deprecated` Copyright (C) 2015, Stanford University, 
+`v3d.c`, `v3d.h`, `v2d.c`, `v2d.h`, and contents of `deprecated` Copyright (C) 2015, Stanford University, 
 through SLAC National Accelerator Laboratory.
 
 See source file headers for full license text. All code is open-source, subject to terms of the
