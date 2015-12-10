@@ -565,7 +565,7 @@ void test_rasterization() {
 	r2d_rvec2 dx = {1.0/NGRID, 1.0/NGRID};
 	r2d_dvec2 ibox[2];
 	r2d_get_ibox(&poly, ibox, dx);
-	printf("Rasterizing a tetrahedron to a grid with dx = %f %f and moments of order %d\n", dx.x, dx.y, POLY_ORDER);
+	printf("Rasterizing a triangle to a grid with dx = %f %f and moments of order %d\n", dx.x, dx.y, POLY_ORDER);
 	printf("Minimum index box = %d %d to %d %d\n", ibox[0].i, ibox[0].j, ibox[1].i, ibox[1].j);
 	r2d_int npix = (ibox[1].i-ibox[0].i)*(ibox[1].j-ibox[0].j);
 	r2d_real* grid = calloc(npix*nmom, sizeof(r2d_real));
