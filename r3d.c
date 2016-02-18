@@ -728,9 +728,9 @@ void r3d_tet_faces_from_verts(r3d_plane* faces, r3d_rvec3* verts) {
 }
 
 void r3d_box_faces_from_verts(r3d_plane* faces, r3d_rvec3* rbounds) {
-	faces[0].n.x = 0.0; faces[0].n.y = 0.0; faces[0].n.z = 1.0; faces[0].d = rbounds[0].z; 
-	faces[2].n.x = 0.0; faces[2].n.y = 1.0; faces[2].n.z = 0.0; faces[2].d = rbounds[0].y; 
-	faces[4].n.x = 1.0; faces[4].n.y = 0.0; faces[4].n.z = 0.0; faces[4].d = rbounds[0].x; 
+	faces[0].n.x = 0.0; faces[0].n.y = 0.0; faces[0].n.z = 1.0; faces[0].d = -rbounds[0].z; 
+	faces[2].n.x = 0.0; faces[2].n.y = 1.0; faces[2].n.z = 0.0; faces[2].d = -rbounds[0].y; 
+	faces[4].n.x = 1.0; faces[4].n.y = 0.0; faces[4].n.z = 0.0; faces[4].d = -rbounds[0].x; 
 	faces[1].n.x = 0.0; faces[1].n.y = 0.0; faces[1].n.z = -1.0; faces[1].d = rbounds[1].z; 
 	faces[3].n.x = 0.0; faces[3].n.y = -1.0; faces[3].n.z = 0.0; faces[3].d = rbounds[1].y; 
 	faces[5].n.x = -1.0; faces[5].n.y = 0.0; faces[5].n.z = 0.0; faces[5].d = rbounds[1].x; 
