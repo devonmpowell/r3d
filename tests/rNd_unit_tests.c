@@ -237,8 +237,7 @@ void test_moments() {
 	// TODO: just volume for now
 
 	// variables: the polyhedra and their moments
-	rNd_int i;
-	rNd_real tmp, tetvol;
+	rNd_real tetvol;
 	rNd_real verts[RND_DIM+1][RND_DIM];
 	rNd_poly opoly;
 	rNd_real om[1];
@@ -248,6 +247,7 @@ void test_moments() {
 	rNd_init_simplex(&opoly, verts);
 	tetvol = rNd_orient(verts);
 
+#undef NUM_TRIALS
 #define NUM_TRIALS 1000
 	r3d_int trial;
 	printf("Computing moments of order %d, %d trials.\n", POLY_ORDER, NUM_TRIALS);

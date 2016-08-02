@@ -252,10 +252,9 @@ rNd_real reduce_helper(rNd_poly* poly, rNd_int v, rNd_int d, rNd_int processed[R
 void rNd_reduce(rNd_poly* poly, rNd_real* moments, rNd_int polyorder) {
 
 #if 1
-	rNd_int v, i, j;
+	rNd_int v;
 
 	// direct access to vertex buffer
-	rNd_vertex* vertbuffer = poly->verts; 
 	rNd_int* nverts = &poly->nverts; 
 	
 	moments[0] = 0.0;
