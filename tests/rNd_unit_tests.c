@@ -248,6 +248,7 @@ void test_moments() {
 	rNd_init_simplex(&opoly, verts);
 	tetvol = rNd_orient(verts);
 
+#undef NUM_TRIALS
 #define NUM_TRIALS 1000
 	r3d_int trial;
 	printf("Computing moments of order %d, %d trials.\n", POLY_ORDER, NUM_TRIALS);

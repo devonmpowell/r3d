@@ -518,6 +518,7 @@ void test_tet_tet_timing() {
 
 	// Intersects pairs of tetrahedra, for timing purposes only.
 
+#undef NUM_TRIALS
 #define NUM_TRIALS 100000
 
 	// variables: the polyhedra and their moments
@@ -708,6 +709,7 @@ void test_voxelization() {
 	// do indeed sum to those of the original input
 
 #include "v3d.h"
+#undef POLY_ORDER
 #define POLY_ORDER 4
 #define NGRID 23
 
@@ -764,7 +766,9 @@ void test_moments() {
 	// check the moments against an analytic test case
 	// (an axis-aligned box) up to some arbitrary order 
 	
+#undef POLY_ORDER
 #define POLY_ORDER 20
+#undef NUM_TRIALS
 #define NUM_TRIALS 1000
 	
 	r3d_int i, j, k, mind, curorder;
