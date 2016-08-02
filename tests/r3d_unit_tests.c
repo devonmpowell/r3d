@@ -714,7 +714,7 @@ void test_voxelization() {
 #define NGRID 23
 
 	// vars
-	r3d_int i, j, k, v, curorder, mind;
+	r3d_int i, j, v, curorder, mind;
 	r3d_long gg; 
 	r3d_int nmom = R3D_NUM_MOMENTS(POLY_ORDER);
 	r3d_real voxsum, tmom[nmom];
@@ -748,7 +748,7 @@ void test_voxelization() {
 		//printf("Order = %d\n", curorder);
 		for(i = curorder; i >= 0; --i)
 		for(j = curorder - i; j >= 0; --j, ++mind) {
-			k = curorder - i - j;
+			//k = curorder - i - j;
 			voxsum = 0.0;
 			for(gg = 0; gg < nvoxels; ++gg) voxsum += grid[nmom*gg+mind];
 			//printf(" Int[ x^%d y^%d z^%d dV ] original = %.10e, voxsum = %.10e, error = %.10e\n", 

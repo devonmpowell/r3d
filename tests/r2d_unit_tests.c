@@ -544,7 +544,7 @@ void test_rasterization() {
 #define NGRID 17
 
 	// vars
-	r2d_int i, j, v, curorder, mind;
+	r2d_int i, v, curorder, mind;
 	r2d_long gg; 
 	r2d_int nmom = R2D_NUM_MOMENTS(POLY_ORDER);
 	r2d_real voxsum, tmom[nmom];
@@ -577,7 +577,7 @@ void test_rasterization() {
 	for(curorder = 0, mind = 0; curorder <= POLY_ORDER; ++curorder) {
 		//printf("Order = %d\n", curorder);
 		for(i = curorder; i >= 0; --i, ++mind) {
-			j = curorder - i;
+			//j = curorder - i;
 			voxsum = 0.0;
 			for(gg = 0; gg < npix; ++gg) voxsum += grid[nmom*gg+mind];
 			//printf(" Int[ x^%d y^%d dV ] original = %.10e, voxsum = %.10e, error = %.10e\n", 
