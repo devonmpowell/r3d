@@ -237,8 +237,7 @@ void test_moments() {
 	// TODO: just volume for now
 
 	// variables: the polyhedra and their moments
-	rNd_int i;
-	rNd_real tmp, tetvol;
+	rNd_real tetvol;
 	rNd_real verts[RND_DIM+1][RND_DIM];
 	rNd_poly opoly;
 	rNd_real om[1];
