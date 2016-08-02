@@ -564,7 +564,7 @@ void test_rasterization() {
 	r2d_reduce(&poly, tmom, POLY_ORDER);
 
 	// rasterize it
-	r2d_rvec2 dx = {1.0/NGRID, 1.0/NGRID};
+	r2d_rvec2 dx = {{1.0/NGRID, 1.0/NGRID}};
 	r2d_dvec2 ibox[2];
 	r2d_get_ibox(&poly, ibox, dx);
 	printf("Rasterizing a triangle to a grid with dx = %f %f and moments of order %d\n", dx.x, dx.y, POLY_ORDER);

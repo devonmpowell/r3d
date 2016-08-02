@@ -734,7 +734,7 @@ void test_voxelization() {
 	r3d_reduce(&poly, tmom, POLY_ORDER);
 
 	// voxelize it
-	r3d_rvec3 dx = {1.0/NGRID, 1.0/NGRID, 1.0/NGRID};
+	r3d_rvec3 dx = {{1.0/NGRID, 1.0/NGRID, 1.0/NGRID}};
 	r3d_dvec3 ibox[2];
 	r3d_get_ibox(&poly, ibox, dx);
 	printf("Voxelizing a tetrahedron to a grid with dx = %f %f %f and moments of order %d\n", dx.x, dx.y, dx.z, POLY_ORDER);
