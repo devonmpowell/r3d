@@ -399,6 +399,7 @@ void test_tri_tri_timing() {
 
 	// Intersects pairs of tetrahedra, for timing purposes only.
 
+#undef NUM_TRIALS
 #define NUM_TRIALS 100000
 
 	// variables: the polyhedra and their moments
@@ -537,12 +538,12 @@ void test_rasterization() {
 	// Test r2d_rasterize() by checking that the rasterized moments
 	// do indeed sum to those of the original input
 
-#include "v2d.h"
+#undef POLY_ORDER
 #define POLY_ORDER 3
 #define NGRID 17
 
 	// vars
-	r2d_int i, j, v, curorder, mind;
+	r2d_int i, v, curorder, mind;
 	r2d_long gg; 
 	r2d_int nmom = R2D_NUM_MOMENTS(POLY_ORDER);
 	r2d_real voxsum, tmom[nmom];
@@ -562,7 +563,7 @@ void test_rasterization() {
 	r2d_reduce(&poly, tmom, POLY_ORDER);
 
 	// rasterize it
-	r2d_rvec2 dx = {1.0/NGRID, 1.0/NGRID};
+	r2d_rvec2 dx = {{1.0/NGRID, 1.0/NGRID}};
 	r2d_dvec2 ibox[2];
 	r2d_get_ibox(&poly, ibox, dx);
 	printf("Rasterizing a triangle to a grid with dx = %f %f and moments of order %d\n", dx.x, dx.y, POLY_ORDER);
@@ -575,7 +576,7 @@ void test_rasterization() {
 	for(curorder = 0, mind = 0; curorder <= POLY_ORDER; ++curorder) {
 		//printf("Order = %d\n", curorder);
 		for(i = curorder; i >= 0; --i, ++mind) {
-			j = curorder - i;
+			//j = curorder - i;
 			voxsum = 0.0;
 			for(gg = 0; gg < npix; ++gg) voxsum += grid[nmom*gg+mind];
 			//printf(" Int[ x^%d y^%d dV ] original = %.10e, voxsum = %.10e, error = %.10e\n", 
@@ -595,6 +596,7 @@ void test_moments() {
 	// check the moments against an analytic test case
 	// (an axis-aligned box) up to some arbitrary order 
 	
+#undef POLY_ORDER
 #define POLY_ORDER 20
 	
 	r2d_int i, j, mind, curorder;

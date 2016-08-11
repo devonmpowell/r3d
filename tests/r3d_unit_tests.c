@@ -518,6 +518,7 @@ void test_tet_tet_timing() {
 
 	// Intersects pairs of tetrahedra, for timing purposes only.
 
+#undef NUM_TRIALS
 #define NUM_TRIALS 100000
 
 	// variables: the polyhedra and their moments
@@ -707,12 +708,12 @@ void test_voxelization() {
 	// Test r3d_voxelize() by checking that the voxelized moments
 	// do indeed sum to those of the original input
 
-#include "v3d.h"
+#undef POLY_ORDER
 #define POLY_ORDER 4
 #define NGRID 23
 
 	// vars
-	r3d_int i, j, k, v, curorder, mind;
+	r3d_int i, j, v, curorder, mind;
 	r3d_long gg; 
 	r3d_int nmom = R3D_NUM_MOMENTS(POLY_ORDER);
 	r3d_real voxsum, tmom[nmom];
@@ -732,7 +733,7 @@ void test_voxelization() {
 	r3d_reduce(&poly, tmom, POLY_ORDER);
 
 	// voxelize it
-	r3d_rvec3 dx = {1.0/NGRID, 1.0/NGRID, 1.0/NGRID};
+	r3d_rvec3 dx = {{1.0/NGRID, 1.0/NGRID, 1.0/NGRID}};
 	r3d_dvec3 ibox[2];
 	r3d_get_ibox(&poly, ibox, dx);
 	printf("Voxelizing a tetrahedron to a grid with dx = %f %f %f and moments of order %d\n", dx.x, dx.y, dx.z, POLY_ORDER);
@@ -746,7 +747,7 @@ void test_voxelization() {
 		//printf("Order = %d\n", curorder);
 		for(i = curorder; i >= 0; --i)
 		for(j = curorder - i; j >= 0; --j, ++mind) {
-			k = curorder - i - j;
+			//k = curorder - i - j;
 			voxsum = 0.0;
 			for(gg = 0; gg < nvoxels; ++gg) voxsum += grid[nmom*gg+mind];
 			//printf(" Int[ x^%d y^%d z^%d dV ] original = %.10e, voxsum = %.10e, error = %.10e\n", 
@@ -764,6 +765,8 @@ void test_moments() {
 	// check the moments against an analytic test case
 	// (an axis-aligned box) up to some arbitrary order 
 	
+#undef POLY_ORDER
+#undef NUM_TRIALS
 #define POLY_ORDER 20
 #define NUM_TRIALS 1000
 	
