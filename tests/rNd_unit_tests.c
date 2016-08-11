@@ -49,7 +49,7 @@ void test_split_simplex_thru_centroid() {
 
 	// variables: the polyhedra and their moments
 	rNd_int i;
-	rNd_real verts[RND_DIM+1][RND_DIM];
+	rNd_rvec verts[RND_DIM+1];
 	rNd_poly opoly, poly1, poly2;
 	rNd_real om[1], m1[1], m2[1];
 
@@ -64,7 +64,7 @@ void test_split_simplex_thru_centroid() {
 	poly1 = opoly;
 	poly2 = opoly;
 	rNd_clip(&poly1, &splane, 1);
-	for(i = 0; i < RND_DIM; ++i) splane.n[i] *= -1; 
+	for(i = 0; i < RND_DIM; ++i) splane.n.xyz[i] *= -1; 
 	splane.d *= -1;
 	rNd_clip(&poly2, &splane, 1);
 
@@ -96,9 +96,8 @@ void test_nonconvex() {
 	// under parity inversion 
 
 	// variables: the polyhedra and their moments
-	rNd_int i;
-	rNd_real tmp, tetvol;
-	rNd_real verts[RND_DIM+1][RND_DIM];
+	rNd_real tetvol;
+	rNd_rvec tmp, verts[RND_DIM+1];
 	rNd_poly opoly;
 	rNd_real om[1];
 
@@ -116,11 +115,9 @@ void test_nonconvex() {
 	EXPECT_EQ(om[0], tetvol, TOL_WARN);
 
 	// flip the simplex and try to reduce again
-	for(i = 0; i < RND_DIM; ++i) {
-		tmp = verts[0][i];
-		verts[0][i] = verts[1][i];
-		verts[1][i] = tmp;
-	}
+	tmp = verts[0];
+	verts[0] = verts[1];
+	verts[1] = tmp;
 	rNd_init_simplex(&opoly, verts);
 	rNd_reduce(&opoly, om, POLY_ORDER);
 	tetvol = rNd_orient(verts);
@@ -144,7 +141,7 @@ void test_recursive_splitting_nondegenerate() {
 	rNd_int depthstack[STACK_SIZE];
 
 	// variables: the polyhedra and their moments
-	rNd_real verts[RND_DIM+1][RND_DIM];
+	rNd_rvec verts[RND_DIM+1];
 	rNd_poly opoly, poly1, poly2;
 	rNd_plane splane;
 	rNd_real om[1], m1[1], m2[1];
@@ -181,7 +178,7 @@ void test_recursive_splitting_nondegenerate() {
 			poly1 = opoly;
 			poly2 = opoly;
 			rNd_clip(&poly1, &splane, 1);
-			for(i = 0; i < RND_DIM; ++i) splane.n[i] *= -1; 
+			for(i = 0; i < RND_DIM; ++i) splane.n.xyz[i] *= -1; 
 			splane.d *= -1;
 			rNd_clip(&poly2, &splane, 1);
 		
@@ -239,7 +236,7 @@ void test_moments() {
 	// variables: the polyhedra and their moments
 	rNd_int i;
 	rNd_real tmp, tetvol;
-	rNd_real verts[RND_DIM+1][RND_DIM];
+	rNd_rvec verts[RND_DIM+1];
 	rNd_poly opoly;
 	rNd_real om[1];
 
@@ -248,8 +245,9 @@ void test_moments() {
 	rNd_init_simplex(&opoly, verts);
 	tetvol = rNd_orient(verts);
 
+#undef NUM_TRIALS
 #define NUM_TRIALS 1000
-	r3d_int trial;
+	rNd_int trial;
 	printf("Computing moments of order %d, %d trials.\n", POLY_ORDER, NUM_TRIALS);
 	for(trial = 0; trial < NUM_TRIALS; ++trial) {
 
@@ -265,6 +263,81 @@ void test_moments() {
 }
 
 
+void test_voxelization() {
+
+	// Test rNd_voxelize() by checking that the voxelized moments
+	// do indeed sum to those of the original input
+
+#undef POLY_ORDER
+#define POLY_ORDER 0
+#define NGRID 4 //#23
+
+	// vars
+	rNd_int i, j, k, v, curorder, mind;
+	rNd_long gg; 
+	rNd_int nmom = 1; //R3D_NUM_MOMENTS(POLY_ORDER);
+	rNd_real voxsum, tmom[nmom];
+	rNd_poly poly;
+	rNd_rvec verts[RND_DIM+1];
+
+	// create a random tet in the unit box
+	rand_simplex_Nd(verts, MIN_VOL);
+	for(v = 0; v < RND_DIM+1; ++v)
+	for(i = 0; i < RND_DIM; ++i) {
+		verts[v].xyz[i] += 1.0;
+		verts[v].xyz[i] *= 0.5;
+	}
+	rNd_init_simplex(&poly, verts);
+
+	// get its original moments for reference
+	rNd_reduce(&poly, tmom, POLY_ORDER);
+
+	// voxelize it
+	rNd_rvec dx;
+	for(i = 0; i < RND_DIM; ++i) dx.xyz[i] = 1.0/NGRID;
+	rNd_dvec ibox[2];
+	rNd_get_ibox(&poly, ibox, dx);
+	printf("Voxelizing a simplex to a grid with dx = ");
+	for(i = 0; i < RND_DIM; ++i) printf("%f ", dx.xyz[i]);
+	printf("and moments of order %d\n", POLY_ORDER);
+	printf("Minimum index box = "); 
+	for(i = 0; i < RND_DIM; ++i) printf("%d ", ibox[0].ijk[i]);
+	printf("to ");
+	for(i = 0; i < RND_DIM; ++i) printf("%d ", ibox[1].ijk[i]);
+	printf("\n");
+	rNd_int nvoxels = 1;
+	for(i = 0; i < RND_DIM; ++i) nvoxels *= ibox[1].ijk[i]-ibox[0].ijk[i];
+	rNd_real* grid = calloc(nvoxels*nmom, sizeof(rNd_real));
+	rNd_voxelize(&poly, ibox, grid, dx, POLY_ORDER);
+
+	voxsum = 0.0;
+	for(gg = 0; gg < nvoxels; ++gg) voxsum += grid[gg];
+	for(gg = 0; gg < nvoxels; ++gg) printf("grid[%d] = %f\n", gg, grid[gg]); 
+	printf(" original = %.10e, voxsum = %.10e, error = %.10e\n", 
+			tmom[0], voxsum, fabs(1.0 - tmom[0]/voxsum));
+	ASSERT_EQ(tmom[0], voxsum, TOL_FAIL);
+	EXPECT_EQ(tmom[0], voxsum, TOL_WARN);
+	
+#if 0
+	// make sure the sum of each moment equals the original 
+	for(curorder = 0, mind = 0; curorder <= POLY_ORDER; ++curorder) {
+		printf("Order = %d\n", curorder);
+		for(i = curorder; i >= 0; --i)
+		for(j = curorder - i; j >= 0; --j, ++mind) {
+			k = curorder - i - j;
+			voxsum = 0.0;
+			for(gg = 0; gg < nvoxels; ++gg) voxsum += grid[nmom*gg+mind];
+			printf(" Int[ x^%d y^%d z^%d dV ] original = %.10e, voxsum = %.10e, error = %.10e\n", 
+					i, j, k, tmom[mind], voxsum, fabs(1.0 - tmom[mind]/voxsum));
+			ASSERT_EQ(tmom[mind], voxsum, TOL_FAIL);
+			EXPECT_EQ(tmom[mind], voxsum, TOL_WARN);
+		}
+	}
+#endif
+	free(grid);
+}
+
+
 
 
 
@@ -276,8 +349,11 @@ void register_all_tests() {
 
 	register_test(test_split_simplex_thru_centroid, "split_simplex_thru_centroid");
 	//register_test(test_nonconvex, "nonconvex");
-	register_test(test_recursive_splitting_nondegenerate, "recursive_splitting_nondegenerate");
-	register_test(test_moments, "moments");
+	//register_test(test_recursive_splitting_nondegenerate, "recursive_splitting_nondegenerate");
+	//register_test(test_moments, "moments");
+	register_test(test_voxelization, "voxelization");
+	
+
 
 }
 

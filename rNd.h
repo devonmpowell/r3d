@@ -34,7 +34,7 @@
 /*
  * \brief Dimensionality of the geometric calculations.
  */
-#define RND_DIM 6
+#define RND_DIM 4
 
 /**
  * \brief Real type specifying the precision to be used in calculations
@@ -52,12 +52,27 @@ typedef double rNd_real;
  * \brief Integer type used for indexing
  */
 typedef int32_t rNd_int;
+typedef int64_t rNd_long;
+
+/** \struct rNd_rvec
+ *  \brief A N-vector.
+ */
+typedef struct {
+	rNd_real xyz[RND_DIM]; /*!< Index-based access to components. */
+} rNd_rvec;
+
+/** \struct rNd_dvec
+ *  \brief An integer N-vector for grid indexing.
+ */
+typedef struct {
+	rNd_int ijk[RND_DIM]; /*!< Index-based access to components. */
+} rNd_dvec;
 
 /** \struct rNd_plane
  *  \brief A hyperplane.
  */
 typedef struct {
-	rNd_real n[RND_DIM]; /*!< Unit-length normal vector. */
+	rNd_rvec n; /*!< Unit-length normal vector. */
 	rNd_real d; /*!< Signed perpendicular distance to the origin. */
 } rNd_plane;
 
@@ -67,7 +82,7 @@ typedef struct {
 typedef struct {
 	rNd_int pnbrs[RND_DIM]; /*!< Neighboring vertices. */
 	rNd_int finds[RND_DIM][RND_DIM]; /*!< 2-face connectivity (needed for `RND_DIM > 3`). */
-	rNd_real pos[RND_DIM]; /*!< Position. */
+	rNd_rvec pos; /*!< Position. */
 } rNd_vertex;
 
 /** \struct rNd_poly
@@ -135,7 +150,7 @@ rNd_int rNd_is_good(rNd_poly* poly);
  * The signed volume of the input simplex.
  *
  */
-rNd_real rNd_orient(rNd_real verts[RND_DIM+1][RND_DIM]);
+rNd_real rNd_orient(rNd_rvec verts[RND_DIM+1]);
 
 /**
  * \brief Prints the vertices and connectivity of a polytope. For debugging. 
@@ -228,7 +243,7 @@ void rNd_print(rNd_poly* poly);
  * An array of `RND_DIM+1` vectors, giving the vertices of the simplex.
  *
  */
-void rNd_init_simplex(rNd_poly* poly, rNd_real verts[RND_DIM+1][RND_DIM]);
+void rNd_init_simplex(rNd_poly* poly, rNd_rvec verts[RND_DIM+1]);
 
 /**
  * \brief Initialize a polytope as an axis-aligned hyperrectangle. 

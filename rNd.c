@@ -53,7 +53,7 @@ void rNd_clip(rNd_poly* poly, rNd_plane* planes, rNd_int nplanes) {
 		for(v = 0; v < onv; ++v) {
 			sdists[v] = planes[p].d;
 			for(i = 0; i < RND_DIM; ++i)
-				sdists[v] += vertbuffer[v].pos[i]*planes[p].n[i];
+				sdists[v] += vertbuffer[v].pos.xyz[i]*planes[p].n.xyz[i];
 			if(sdists[v] < smin) smin = sdists[v];
 			if(sdists[v] > smax) smax = sdists[v];
 			if(sdists[v] < 0.0) clipped[v] = 1;
@@ -76,8 +76,8 @@ void rNd_clip(rNd_poly* poly, rNd_plane* planes, rNd_int nplanes) {
 				vertbuffer[*nverts].pnbrs[0] = vcur;
 				vertbuffer[vcur].pnbrs[np] = *nverts;
 				for(i = 0; i < RND_DIM; ++i) // weighted average of vertex positions
-					vertbuffer[*nverts].pos[i] = (vertbuffer[vnext].pos[i]*sdists[vcur] 
-							- vertbuffer[vcur].pos[i]*sdists[vnext])/(sdists[vcur] - sdists[vnext]);
+					vertbuffer[*nverts].pos.xyz[i] = (vertbuffer[vnext].pos.xyz[i]*sdists[vcur] 
+							- vertbuffer[vcur].pos.xyz[i]*sdists[vnext])/(sdists[vcur] - sdists[vnext]);
 				for(np0 = 0, np1 = 1; np0 < RND_DIM; ++np0) { 
 					if(np0 == np) continue;
 					vertbuffer[*nverts].finds[0][np1] = vertbuffer[vcur].finds[np][np0];
@@ -172,7 +172,7 @@ void rNd_clip(rNd_poly* poly, rNd_plane* planes, rNd_int nplanes) {
 
 
 
-rNd_real reduce_helper(rNd_poly* poly, rNd_int v, rNd_int d, rNd_int processed[RND_DIM], rNd_real ltd[RND_DIM][RND_DIM]) {
+rNd_real reduce_helper(rNd_poly* poly, rNd_int v, rNd_int d, rNd_int processed[RND_DIM], rNd_rvec ltd[RND_DIM]) {
 
 	// TODO: clean this up
 	// TODO: Make it nonrecursive? More memory-efficient too??
@@ -190,7 +190,7 @@ rNd_real reduce_helper(rNd_poly* poly, rNd_int v, rNd_int d, rNd_int processed[R
 			rNd_real dot = 0.0;
 			
 			for(j = 0; j < RND_DIM; ++j)
-				dot += ltd[dd][j]*poly->verts[v].pos[j];
+				dot += ltd[dd].xyz[j]*poly->verts[v].pos.xyz[j];
 
 			ltdsum *= 1.0*dot/(dd+1);
 
@@ -214,26 +214,26 @@ rNd_real reduce_helper(rNd_poly* poly, rNd_int v, rNd_int d, rNd_int processed[R
 		proc2[i] = 1;
 
 		for(j = 0; j < RND_DIM; ++j)
-			ltd[d][j] = poly->verts[v].pos[j] - poly->verts[poly->verts[v].pnbrs[i]].pos[j];
+			ltd[d].xyz[j] = poly->verts[v].pos.xyz[j] - poly->verts[poly->verts[v].pnbrs[i]].pos.xyz[j];
 
 		// TODO: explore the robustness of the orthogonalization
 
 		for(dd = 0; dd < d; ++dd) {
 			rNd_real dot = 0.0;
 			for(j = 0; j < RND_DIM; ++j)
-				dot += ltd[d][j]*ltd[dd][j];
+				dot += ltd[d].xyz[j]*ltd[dd].xyz[j];
 			for(j = 0; j < RND_DIM; ++j)
-				ltd[d][j] -= dot*ltd[dd][j];
+				ltd[d].xyz[j] -= dot*ltd[dd].xyz[j];
 		}
 
 		rNd_real len = 0.0;
 		for(j = 0; j < RND_DIM; ++j)
-			len += ltd[d][j]*ltd[d][j];
+			len += ltd[d].xyz[j]*ltd[d].xyz[j];
 
 		len = sqrt(len);
 
 		for(j = 0; j < RND_DIM; ++j)
-			ltd[d][j] /= len;
+			ltd[d].xyz[j] /= len;
 
 		//if(d == RND_DIM - 1) {
 			//for(j = 0; j < RND_DIM; ++j)
@@ -266,7 +266,7 @@ void rNd_reduce(rNd_poly* poly, rNd_real* moments, rNd_int polyorder) {
 		rNd_int processed[RND_DIM];
 		memset(&processed, 0, sizeof(processed));
 
-		rNd_real ltd[RND_DIM][RND_DIM];
+		rNd_rvec ltd[RND_DIM];
 
 		rNd_real vtmp = reduce_helper(poly, v, 0, processed, ltd);
 
@@ -510,7 +510,7 @@ void r3d_affine(r3d_poly* poly, r3d_real mat[4][4]) {
 
 #endif
 
-void rNd_init_simplex(rNd_poly* poly, rNd_real verts[RND_DIM+1][RND_DIM]) {
+void rNd_init_simplex(rNd_poly* poly, rNd_rvec verts[RND_DIM+1]) {
 
 	rNd_int v, i;
 	rNd_int v0, v1, v2, np0, np1, np2, f;
@@ -524,7 +524,7 @@ void rNd_init_simplex(rNd_poly* poly, rNd_real verts[RND_DIM+1][RND_DIM]) {
 	*nverts = RND_DIM+1;
 	for(v = 0; v < *nverts; ++v) {
 		for(i = 0; i < RND_DIM; ++i) {
-			vertbuffer[v].pos[i] = verts[v][i];
+			vertbuffer[v].pos.xyz[i] = verts[v].xyz[i];
 			vertbuffer[v].pnbrs[i] = (v+i+1)%(*nverts);
 		}
 	}
@@ -715,7 +715,7 @@ rNd_real rNd_det(rNd_real mat[RND_DIM][RND_DIM]) {
 	return det;
 }
 
-rNd_real rNd_orient(rNd_real verts[RND_DIM+1][RND_DIM]) {
+rNd_real rNd_orient(rNd_rvec verts[RND_DIM+1]) {
 
 	rNd_int i, j;
 	rNd_real fac;
@@ -724,7 +724,7 @@ rNd_real rNd_orient(rNd_real verts[RND_DIM+1][RND_DIM]) {
 	// subtract one vertex from the rest
 	for(i = 0; i < RND_DIM; ++i)
 	for(j = 0; j < RND_DIM; ++j)
-		mat[i][j] = verts[i+1][j]-verts[0][j];
+		mat[i][j] = verts[i+1].xyz[j]-verts[0].xyz[j];
 
 	// get the factorial
 	fac = 1.0;
@@ -738,7 +738,7 @@ void rNd_print(rNd_poly* poly) {
 	rNd_int v, i;
 	for(v = 0; v < poly->nverts; ++v) {
 		printf("vert %d, pos =", v);
-		for(i = 0; i < RND_DIM; ++i) printf(" %.5e", poly->verts[v].pos[i]);
+		for(i = 0; i < RND_DIM; ++i) printf(" %.5e", poly->verts[v].pos.xyz[i]);
 		printf(", nbrs =");
 		for(i = 0; i < RND_DIM; ++i) printf(" %d", poly->verts[v].pnbrs[i]);
 		printf("\n");

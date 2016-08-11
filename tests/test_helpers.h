@@ -30,6 +30,10 @@
 #include "r2d.h"
 #include "rNd.h"
 
+#include "v3d.h"
+#include "v2d.h"
+#include "vNd.h"
+
 /*
  * Random number utilities.
  */
@@ -91,9 +95,9 @@ r2d_rvec2 rand_uvec_2d();
 
 rNd_plane thru_cent_Nd(rNd_poly* poly);
 
-rNd_real rand_simplex_Nd(rNd_real verts[RND_DIM+1][RND_DIM], rNd_real minvol);
+rNd_real rand_simplex_Nd(rNd_rvec verts[RND_DIM+1], rNd_real minvol);
 
-void get_centroid_Nd(rNd_poly* poly, rNd_real centroid[RND_DIM]);
+void get_centroid_Nd(rNd_poly* poly, rNd_rvec centroid);
 
 
 #endif // _TEST_HELPERS_H_

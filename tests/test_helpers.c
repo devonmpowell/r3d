@@ -306,52 +306,50 @@ r2d_rvec2 get_centroid_2d(r2d_poly* poly) {
 rNd_plane thru_cent_Nd(rNd_poly* poly) {
 	// random plane passing through centroid 
 	rNd_plane clip;	
-	rNd_real centroid[RND_DIM];
+	rNd_rvec centroid;
 	rNd_real len;
 	rNd_int i;
-	for(i = 0; i < RND_DIM; ++i) clip.n[i] = rand_normal(); 
+	for(i = 0; i < RND_DIM; ++i) clip.n.xyz[i] = rand_normal(); 
 	len = 0.0;
-	for(i = 0; i < RND_DIM; ++i) len += clip.n[i]*clip.n[i];
+	for(i = 0; i < RND_DIM; ++i) len += clip.n.xyz[i]*clip.n.xyz[i];
 	len = sqrt(len);
-	for(i = 0; i < RND_DIM; ++i) clip.n[i] /= len; 
+	for(i = 0; i < RND_DIM; ++i) clip.n.xyz[i] /= len; 
 	clip.d = 0.0;
 	get_centroid_Nd(poly, centroid);
-	for(i = 0; i < RND_DIM; ++i) clip.d -= centroid[i]*clip.n[i];
+	for(i = 0; i < RND_DIM; ++i) clip.d -= centroid.xyz[i]*clip.n.xyz[i];
 	return clip;
 }
 
 
-rNd_real rand_simplex_Nd(rNd_real verts[RND_DIM+1][RND_DIM], rNd_real minvol) {
+rNd_real rand_simplex_Nd(rNd_rvec verts[RND_DIM+1], rNd_real minvol) {
 	// generates a random simplex with vertices on the unit sphere,
 	// guaranteeing a volume of at least MIN_VOL (to avoid degenerate cases)
 	rNd_int i, v;
-	rNd_real tmp;	
+	rNd_rvec tmp;	
 	rNd_real tetvol = 0.0;
 	while(tetvol < minvol) {
 		for(v = 0; v < RND_DIM+1; ++v)
 		for(i = 0; i < RND_DIM; ++i) {
-			verts[v][i] = rand_uniform(); 
+			verts[v].xyz[i] = rand_uniform(); 
 		}
 		tetvol = rNd_orient(verts);
 		if(tetvol < 0.0) {
-			for(i = 0; i < RND_DIM; ++i) {
-				tmp = verts[0][i];
-				verts[0][i] = verts[1][i];
-				verts[1][i] = tmp;
-			}
+			tmp = verts[0];
+			verts[0] = verts[1];
+			verts[1] = tmp;
 			tetvol = -tetvol;
 		}
 	}
 	return tetvol;
 }
 
-void get_centroid_Nd(rNd_poly* poly, rNd_real centroid[RND_DIM]) {
+void get_centroid_Nd(rNd_poly* poly, rNd_rvec centroid) {
 	// get the "centroid" by averaging vertices
 	rNd_int i, v;
-	for(i = 0; i < RND_DIM; ++i) centroid[i] = 0.0;
+	for(i = 0; i < RND_DIM; ++i) centroid.xyz[i] = 0.0;
 	for(v = 0; v < poly->nverts; ++v)
-		for(i = 0; i < RND_DIM; ++i) centroid[i] += poly->verts[v].pos[i];
-	for(i = 0; i < RND_DIM; ++i) centroid[i] /= poly->nverts;
+		for(i = 0; i < RND_DIM; ++i) centroid.xyz[i] += poly->verts[v].pos.xyz[i];
+	for(i = 0; i < RND_DIM; ++i) centroid.xyz[i] /= poly->nverts;
 }
 
 
