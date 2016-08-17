@@ -449,66 +449,58 @@ rNd_int rNd_is_good(rNd_poly* poly) {
 	return 1;
 }
 
-#if 0
-
-void r3d_rotate(r3d_poly* poly, r3d_real theta, r3d_int axis) {
-	r3d_int v;
-	r3d_rvec3 tmp;
-	r3d_real sine = sin(theta);
-	r3d_real cosine = cos(theta);
+void rNd_rotate(rNd_poly* poly, rNd_real theta, rNd_int ax1, rNd_int ax2) {
+	rNd_int v;
+	rNd_rvec tmp;
+	rNd_real sine = sin(theta);
+	rNd_real cosine = cos(theta);
 	for(v = 0; v < poly->nverts; ++v) {
 		tmp = poly->verts[v].pos;
-		poly->verts[v].pos.xyz[(axis+1)%3] = cosine*tmp.xyz[(axis+1)%3] - sine*tmp.xyz[(axis+2)%3]; 
-		poly->verts[v].pos.xyz[(axis+2)%3] = sine*tmp.xyz[(axis+1)%3] + cosine*tmp.xyz[(axis+2)%3]; 
+		poly->verts[v].pos.xyz[ax1] = cosine*tmp.xyz[ax1] - sine*tmp.xyz[ax2]; 
+		poly->verts[v].pos.xyz[ax2] = sine*tmp.xyz[ax1] + cosine*tmp.xyz[ax2]; 
 	}
 }
 
-void r3d_translate(r3d_poly* poly, r3d_rvec3 shift) {
-	r3d_int v;
-	for(v = 0; v < poly->nverts; ++v) {
-		poly->verts[v].pos.x += shift.x;
-		poly->verts[v].pos.y += shift.y;
-		poly->verts[v].pos.z += shift.z;
-	}
+void rNd_translate(rNd_poly* poly, rNd_rvec shift) {
+	rNd_int v, i;
+	for(v = 0; v < poly->nverts; ++v)
+	for(i = 0; i < RND_DIM; ++i)
+		poly->verts[v].pos.xyz[i] += shift.xyz[i];
 }
 
-void r3d_scale(r3d_poly* poly, r3d_real scale) {
-	r3d_int v;
-	for(v = 0; v < poly->nverts; ++v) {
-		poly->verts[v].pos.x *= scale;
-		poly->verts[v].pos.y *= scale;
-		poly->verts[v].pos.z *= scale;
-	}
+void rNd_scale(rNd_poly* poly, rNd_real scale) {
+	rNd_int v, i;
+	for(v = 0; v < poly->nverts; ++v)
+	for(i = 0; i < RND_DIM; ++i)
+		poly->verts[v].pos.xyz[i] *= scale;
 }
 
-void r3d_shear(r3d_poly* poly, r3d_real shear, r3d_int axb, r3d_int axs) {
-	r3d_int v;
-	for(v = 0; v < poly->nverts; ++v) {
+void rNd_shear(rNd_poly* poly, rNd_real shear, rNd_int axb, rNd_int axs) {
+	rNd_int v;
+	for(v = 0; v < poly->nverts; ++v)
 		poly->verts[v].pos.xyz[axb] += shear*poly->verts[v].pos.xyz[axs];
-	}
 }
 
-void r3d_affine(r3d_poly* poly, r3d_real mat[4][4]) {
-	r3d_int v;
-	r3d_rvec3 tmp;
-	r3d_real w;
+void rNd_affine(rNd_poly* poly, rNd_real mat[RND_DIM+1][RND_DIM+1]) {
+	rNd_int v, i, j;
+	rNd_rvec tmp;
+	rNd_real w;
 	for(v = 0; v < poly->nverts; ++v) {
 		tmp = poly->verts[v].pos;
-
 		// affine transformation
-		poly->verts[v].pos.x = tmp.x*mat[0][0] + tmp.y*mat[0][1] + tmp.z*mat[0][2] + mat[0][3];
-		poly->verts[v].pos.y = tmp.x*mat[1][0] + tmp.y*mat[1][1] + tmp.z*mat[1][2] + mat[1][3];
-		poly->verts[v].pos.z = tmp.x*mat[2][0] + tmp.y*mat[2][1] + tmp.z*mat[2][2] + mat[2][3];
-		w = tmp.x*mat[3][0] + tmp.y*mat[3][1] + tmp.z*mat[3][2] + mat[3][3];
-	
+		for(i = 0; i < RND_DIM; ++i)
+		for(j = 0; j < RND_DIM; ++j)
+			poly->verts[v].pos.xyz[i] = tmp.xyz[j]*mat[i][j];
+		for(i = 0; i < RND_DIM; ++i)
+			poly->verts[v].pos.xyz[i] += mat[i][RND_DIM];
 		// homogeneous divide if w != 1, i.e. in a perspective projection
-		poly->verts[v].pos.x /= w;
-		poly->verts[v].pos.y /= w;
-		poly->verts[v].pos.z /= w;
+		w = 0.0;
+		for(j = 0; j < RND_DIM; ++j)
+			w += tmp.xyz[j]*mat[RND_DIM][j];
+		for(i = 0; i < RND_DIM; ++i)
+			poly->verts[v].pos.xyz[i] /= w; 
 	}
 }
-
-#endif
 
 void rNd_init_simplex(rNd_poly* poly, rNd_rvec verts[RND_DIM+1]) {
 

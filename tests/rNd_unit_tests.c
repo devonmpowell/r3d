@@ -270,7 +270,7 @@ void test_voxelization() {
 
 #undef POLY_ORDER
 #define POLY_ORDER 0
-#define NGRID 4 //#23
+#define NGRID 17 
 
 	// vars
 	rNd_int i, j, k, v, curorder, mind;
@@ -310,37 +310,16 @@ void test_voxelization() {
 	rNd_real* grid = calloc(nvoxels*nmom, sizeof(rNd_real));
 	rNd_voxelize(&poly, ibox, grid, dx, POLY_ORDER);
 
+	// test the sum (volume only for now)
 	voxsum = 0.0;
 	for(gg = 0; gg < nvoxels; ++gg) voxsum += grid[gg];
-	for(gg = 0; gg < nvoxels; ++gg) printf("grid[%d] = %f\n", gg, grid[gg]); 
 	printf(" original = %.10e, voxsum = %.10e, error = %.10e\n", 
 			tmom[0], voxsum, fabs(1.0 - tmom[0]/voxsum));
 	ASSERT_EQ(tmom[0], voxsum, TOL_FAIL);
 	EXPECT_EQ(tmom[0], voxsum, TOL_WARN);
 	
-#if 0
-	// make sure the sum of each moment equals the original 
-	for(curorder = 0, mind = 0; curorder <= POLY_ORDER; ++curorder) {
-		printf("Order = %d\n", curorder);
-		for(i = curorder; i >= 0; --i)
-		for(j = curorder - i; j >= 0; --j, ++mind) {
-			k = curorder - i - j;
-			voxsum = 0.0;
-			for(gg = 0; gg < nvoxels; ++gg) voxsum += grid[nmom*gg+mind];
-			printf(" Int[ x^%d y^%d z^%d dV ] original = %.10e, voxsum = %.10e, error = %.10e\n", 
-					i, j, k, tmom[mind], voxsum, fabs(1.0 - tmom[mind]/voxsum));
-			ASSERT_EQ(tmom[mind], voxsum, TOL_FAIL);
-			EXPECT_EQ(tmom[mind], voxsum, TOL_WARN);
-		}
-	}
-#endif
 	free(grid);
 }
-
-
-
-
-
 
 
 // -- user-implemented functions declared in utest.h -- //

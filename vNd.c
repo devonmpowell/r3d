@@ -139,23 +139,17 @@ void rNd_voxelize(rNd_poly* poly, rNd_dvec ibox[2], rNd_real* dest_grid, rNd_rve
 
 void rNd_split(rNd_poly* inpoly, rNd_poly** outpolys, rNd_real coord, rNd_int ax) {
 
-	rNd_plane splane;
-	memset(&splane, 0, sizeof(splane));
-	// TODO: which orientation is correct?? 
-	//splane.n.xyz[ax] = 1.0;
-	//splane.d = -coord;
-	splane.n.xyz[ax] = -1.0;
-	splane.d = coord;
-
 	// naive split for now
 	*outpolys[0] = *inpoly;
 	*outpolys[1] = *inpoly;
-
+	rNd_plane splane;
+	memset(&splane, 0, sizeof(splane));
+	splane.n.xyz[ax] = -1.0;
+	splane.d = coord;
 	rNd_clip(outpolys[0], &splane, 1);
 	splane.n.xyz[ax] *= -1; 
 	splane.d *= -1;
 	rNd_clip(outpolys[1], &splane, 1);
-
 
 #if 0
 
