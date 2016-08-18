@@ -135,7 +135,7 @@ void rNd_reduce(rNd_poly* poly, rNd_real* moments, rNd_int polyorder);
  * The polytope to check.
  *
  * \return
- * 1 if the polytope is good, 0 if not. 
+ * 1 if the polytope is valid, 0 if not. 
  *
  */
 rNd_int rNd_is_good(rNd_poly* poly);
@@ -170,12 +170,14 @@ void rNd_print(rNd_poly* poly);
  * \param [in] theta 
  * The angle, in radians, by which to rotate the polytope.
  *
- * \param [in] axis 
- * The axis (0, 1, or 2 corresponding to x, y, or z) 
- * about which to rotate the polytope.
+ * \param [in] ax1 
+ * Along with `ax2`, the plane in which to rotate the polytope.
+ *
+ * \param [in] ax2 
+ * Along with `ax1`, the plane in which to rotate the polytope.
  *
  */
-//void rNd_rotate(rNd_poly* poly, rNd_real theta, rNd_int axis);
+void rNd_rotate(rNd_poly* poly, rNd_real theta, rNd_int ax1, rNd_int ax2);
 
 /**
  * \brief Translate a polytope. 
@@ -187,7 +189,7 @@ void rNd_print(rNd_poly* poly);
  * The vector by which to translate the polytope. 
  *
  */
-//void rNd_translate(rNd_poly* poly, rNd_rvec3 shift);
+void rNd_translate(rNd_poly* poly, rNd_rvec shift);
 
 /**
  * \brief Scale a polytope.
@@ -195,11 +197,11 @@ void rNd_print(rNd_poly* poly);
  * \param [in, out] poly 
  * The polytope to scale. 
  *
- * \param [in] shift 
- * The factor by which to scale the polytope. 
+ * \param [in] scale 
+ * The factor by which to scale the polytope along each dimension. 
  *
  */
-//void rNd_scale(rNd_poly* poly, rNd_real scale);
+void rNd_scale(rNd_poly* poly, rNd_rvec scale);
 
 /**
  * \brief Shear a polytope. Each vertex undergoes the transformation
@@ -212,13 +214,13 @@ void rNd_print(rNd_poly* poly);
  * The factor by which to shear the polytope. 
  *
  * \param [in] axb 
- * The axis (0, 1, or 2 corresponding to x, y, or z) along which to shear the polytope.
+ * The axis along which to shear the polytope.
  *
  * \param [in] axs 
- * The axis (0, 1, or 2 corresponding to x, y, or z) across which to shear the polytope.
+ * The axis across which to shear the polytope.
  *
  */
-//void rNd_shear(rNd_poly* poly, rNd_real shear, rNd_int axb, rNd_int axs);
+void rNd_shear(rNd_poly* poly, rNd_real shear, rNd_int axb, rNd_int axs);
 
 /**
  * \brief Apply a general affine transformation to a polytope. 
@@ -227,11 +229,10 @@ void rNd_print(rNd_poly* poly);
  * The polytope to transform.
  *
  * \param [in] mat 
- * The 4x4 homogeneous transformation matrix by which to transform
- * the vertices of the polytope.
+ * The `(RND_DIM+1)*(RND_DIM+1)` homogeneous transformation matrix.
  *
  */
-//void rNd_affine(rNd_poly* poly, rNd_real mat[4][4]);
+void rNd_affine(rNd_poly* poly, rNd_real mat[RND_DIM+1][RND_DIM+1]);
 
 /**
  * \brief Initialize a polytope as an `RND_DIM`-simplex. 
@@ -255,7 +256,7 @@ void rNd_init_simplex(rNd_poly* poly, rNd_rvec verts[RND_DIM+1]);
  * An array of two vectors, giving the lower and upper corners of the box.
  *
  */
-//void rNd_init_box(rNd_poly* poly, rNd_rvec3* rbounds);
+void rNd_init_box(rNd_poly* poly, rNd_rvec rbounds[2]);
 
 /**
  * \brief Get `RND_DIM+1` hyperfaces (unit normals and distances to the origin)

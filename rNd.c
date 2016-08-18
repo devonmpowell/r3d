@@ -468,11 +468,11 @@ void rNd_translate(rNd_poly* poly, rNd_rvec shift) {
 		poly->verts[v].pos.xyz[i] += shift.xyz[i];
 }
 
-void rNd_scale(rNd_poly* poly, rNd_real scale) {
+void rNd_scale(rNd_poly* poly, rNd_rvec scale) {
 	rNd_int v, i;
 	for(v = 0; v < poly->nverts; ++v)
 	for(i = 0; i < RND_DIM; ++i)
-		poly->verts[v].pos.xyz[i] *= scale;
+		poly->verts[v].pos.xyz[i] *= scale.xyz[i];
 }
 
 void rNd_shear(rNd_poly* poly, rNd_real shear, rNd_int axb, rNd_int axs) {
@@ -512,12 +512,12 @@ void rNd_init_simplex(rNd_poly* poly, rNd_rvec verts[RND_DIM+1]) {
 	rNd_int* nverts = &poly->nverts; 
 	rNd_int* nfaces = &poly->nfaces; 
 
-	// set up vertex connectivity
+	// set up vertex positions and connectivity
 	*nverts = RND_DIM+1;
-	for(v = 0; v < *nverts; ++v) {
+	for(v = 0; v < RND_DIM+1; ++v) {
 		for(i = 0; i < RND_DIM; ++i) {
 			vertbuffer[v].pos.xyz[i] = verts[v].xyz[i];
-			vertbuffer[v].pnbrs[i] = (v+i+1)%(*nverts);
+			vertbuffer[v].pnbrs[i] = (v+i+1)%(RND_DIM+1);
 		}
 	}
 
@@ -545,65 +545,36 @@ void rNd_init_simplex(rNd_poly* poly, rNd_rvec verts[RND_DIM+1]) {
 	*nfaces = f;
 }
 
-#if 0
-void r3d_init_box(r3d_poly* poly, r3d_rvec3 rbounds[2]) {
+void rNd_init_box(rNd_poly* poly, rNd_rvec rbounds[2]) {
+
+	rNd_int i, v, np, np1, stride;
 
 	// direct access to vertex buffer
-	r3d_vertex* vertbuffer = poly->verts; 
-	r3d_int* nverts = &poly->nverts; 
-	
-	*nverts = 8;
-	vertbuffer[0].pnbrs[0] = 1;	
-	vertbuffer[0].pnbrs[1] = 4;	
-	vertbuffer[0].pnbrs[2] = 3;	
-	vertbuffer[1].pnbrs[0] = 2;	
-	vertbuffer[1].pnbrs[1] = 5;	
-	vertbuffer[1].pnbrs[2] = 0;	
-	vertbuffer[2].pnbrs[0] = 3;	
-	vertbuffer[2].pnbrs[1] = 6;	
-	vertbuffer[2].pnbrs[2] = 1;	
-	vertbuffer[3].pnbrs[0] = 0;	
-	vertbuffer[3].pnbrs[1] = 7;	
-	vertbuffer[3].pnbrs[2] = 2;	
-	vertbuffer[4].pnbrs[0] = 7;	
-	vertbuffer[4].pnbrs[1] = 0;	
-	vertbuffer[4].pnbrs[2] = 5;	
-	vertbuffer[5].pnbrs[0] = 4;	
-	vertbuffer[5].pnbrs[1] = 1;	
-	vertbuffer[5].pnbrs[2] = 6;	
-	vertbuffer[6].pnbrs[0] = 5;	
-	vertbuffer[6].pnbrs[1] = 2;	
-	vertbuffer[6].pnbrs[2] = 7;	
-	vertbuffer[7].pnbrs[0] = 6;	
-	vertbuffer[7].pnbrs[1] = 3;	
-	vertbuffer[7].pnbrs[2] = 4;	
-	vertbuffer[0].pos.x = rbounds[0].x; 
-	vertbuffer[0].pos.y = rbounds[0].y; 
-	vertbuffer[0].pos.z = rbounds[0].z; 
-	vertbuffer[1].pos.x = rbounds[1].x; 
-	vertbuffer[1].pos.y = rbounds[0].y; 
-	vertbuffer[1].pos.z = rbounds[0].z; 
-	vertbuffer[2].pos.x = rbounds[1].x; 
-	vertbuffer[2].pos.y = rbounds[1].y; 
-	vertbuffer[2].pos.z = rbounds[0].z; 
-	vertbuffer[3].pos.x = rbounds[0].x; 
-	vertbuffer[3].pos.y = rbounds[1].y; 
-	vertbuffer[3].pos.z = rbounds[0].z; 
-	vertbuffer[4].pos.x = rbounds[0].x; 
-	vertbuffer[4].pos.y = rbounds[0].y; 
-	vertbuffer[4].pos.z = rbounds[1].z; 
-	vertbuffer[5].pos.x = rbounds[1].x; 
-	vertbuffer[5].pos.y = rbounds[0].y; 
-	vertbuffer[5].pos.z = rbounds[1].z; 
-	vertbuffer[6].pos.x = rbounds[1].x; 
-	vertbuffer[6].pos.y = rbounds[1].y; 
-	vertbuffer[6].pos.z = rbounds[1].z; 
-	vertbuffer[7].pos.x = rbounds[0].x; 
-	vertbuffer[7].pos.y = rbounds[1].y; 
-	vertbuffer[7].pos.z = rbounds[1].z; 
+	rNd_vertex* vertbuffer = poly->verts; 
+	rNd_int* nverts = &poly->nverts; 
+	rNd_int* nfaces = &poly->nfaces; 
 
+	// the bit-hacky way
+	*nverts = (1 << RND_DIM);
+	for(v = 0; v < (1 << RND_DIM); ++v)
+	for(i = 0; i < RND_DIM; ++i) {
+		stride = (1 << i);
+		vertbuffer[v].pos.xyz[i] = rbounds[(v & stride) > 0].xyz[i];
+		vertbuffer[v].pnbrs[i] = (v ^ stride); 
+	}
+ 	
+	// TODO: bit hacks for this too!!
+	// TODO: make faces unique!!
+	*nfaces = 0;
+	for(np = 0; np < RND_DIM; ++np)
+	for(np1 = np+1; np1 < RND_DIM; ++np1, ++(*nfaces)) 
+	for(v = 0; v < (1 << RND_DIM); ++v) {
+		vertbuffer[v].finds[np][np1] = *nfaces;
+		vertbuffer[v].finds[np1][np] = *nfaces;
+	}
 }
 
+#if 0
 void r3d_tet_faces_from_verts(r3d_plane* faces, r3d_rvec3* verts) {
 	r3d_rvec3 tmpcent;
 	faces[0].n.x = ((verts[3].y - verts[1].y)*(verts[2].z - verts[1].z) 
