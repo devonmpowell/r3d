@@ -757,8 +757,8 @@ void r3d_poly_faces_from_verts(r3d_plane* faces, r3d_rvec3* vertices, r3d_int nu
 
 			// add cross product of edges to the total normal
 			p0 = vertices[faceinds[f][v]];
-			p1 = vertices[faceinds[f][(v+1)%numvertsperface[v]]];
-			p2 = vertices[faceinds[f][(v+2)%numvertsperface[v]]];
+			p1 = vertices[faceinds[f][(v+1)%numvertsperface[f]]];
+			p2 = vertices[faceinds[f][(v+2)%numvertsperface[f]]];
 			faces[f].n.x += (p1.y - p0.y)*(p2.z - p0.z) - (p1.z - p0.z)*(p2.y - p0.y);
 			faces[f].n.y += (p1.z - p0.z)*(p2.x - p0.x) - (p1.x - p0.x)*(p2.z - p0.z);
 			faces[f].n.z += (p1.x - p0.x)*(p2.y - p0.y) - (p1.y - p0.y)*(p2.x - p0.x);
