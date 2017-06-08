@@ -46,7 +46,7 @@ void r3d_clip(r3d_poly* poly, r3d_plane* planes, r3d_int nplanes) {
 	if(*nverts <= 0) return;
 
 	// variable declarations
-	r3d_int v, p, np, onv, vcur, vnext, vstart, 
+	r3d_int v, p, np, onv, vcur, vcur_old, vnext, vstart,
 			pnext, numunclipped;
 
 	// signed distances to the clipping plane
@@ -607,7 +607,9 @@ void r3d_init_poly(r3d_poly* poly, r3d_rvec3* vertices, r3d_int numverts,
 				vprev = faceinds[f][v];
 				vcur = faceinds[f][(v+1)%numvertsperface[f]];
 				vnext = faceinds[f][(v+2)%numvertsperface[f]];
-				vcur = vstart[vcur] + util[vcur]++;
+				vcur_old = vcur;
+				vcur = vstart[vcur] + util[vcur];
+				util[vcur_old]++;
 				vbtmp[vcur].pnbrs[1] = vnext;
 				vbtmp[vcur].pnbrs[2] = vprev;
 			}
