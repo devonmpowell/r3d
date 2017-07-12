@@ -512,7 +512,7 @@ void r3d_init_poly(r3d_poly* poly, r3d_rvec3* vertices, r3d_int numverts,
 					r3d_int** faceinds, r3d_int* numvertsperface, r3d_int numfaces) {
 
 	// dummy vars
-	r3d_int v, vprev, vcur, vnext, f, np;
+	r3d_int v, vprev, vcur, vcur_old, vnext, f, np;
 
 	// direct access to vertex buffer
 	r3d_vertex* vertbuffer = poly->verts; 
