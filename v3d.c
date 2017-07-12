@@ -54,7 +54,7 @@
 }
 
 // TODO: make this a generic "split" routine that just takes a plane.
-void r3d_split(r3d_poly* inpoly, r3d_poly** outpolys, r3d_real coord, r3d_int ax);
+void r3d_split_coord(r3d_poly* inpoly, r3d_poly** outpolys, r3d_real coord, r3d_int ax);
 
 void r3d_voxelize(r3d_poly* poly, r3d_dvec3 ibox[2], r3d_real* dest_grid, r3d_rvec3 d, r3d_int polyorder) {
 
@@ -115,7 +115,7 @@ void r3d_voxelize(r3d_poly* poly, r3d_dvec3 ibox[2], r3d_real* dest_grid, r3d_rv
 		// split the poly and push children to the stack
 		children[0] = &stack[nstack].poly;
 		children[1] = &stack[nstack+1].poly;
-		r3d_split(&stack[nstack].poly, children, d.xyz[spax]*(stack[nstack].ibox[0].ijk[spax]+dmax/2), spax);
+		r3d_split_coord(&stack[nstack].poly, children, d.xyz[spax]*(stack[nstack].ibox[0].ijk[spax]+dmax/2), spax);
 		memcpy(stack[nstack+1].ibox, stack[nstack].ibox, 2*sizeof(r3d_dvec3));
 		stack[nstack].ibox[1].ijk[spax] -= dmax-dmax/2; 
 		stack[nstack+1].ibox[0].ijk[spax] += dmax/2;
@@ -123,7 +123,7 @@ void r3d_voxelize(r3d_poly* poly, r3d_dvec3 ibox[2], r3d_real* dest_grid, r3d_rv
 	}
 }
 
-void r3d_split(r3d_poly* inpoly, r3d_poly** outpolys, r3d_real coord, r3d_int ax) {
+void r3d_split_coord(r3d_poly* inpoly, r3d_poly** outpolys, r3d_real coord, r3d_int ax) {
 
 	// direct access to vertex buffer
 	if(inpoly->nverts <= 0) return;

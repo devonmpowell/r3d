@@ -124,6 +124,116 @@ void r3d_clip(r3d_poly* poly, r3d_plane* planes, r3d_int nplanes) {
 	}
 }
 
+
+void r3d_split(r3d_poly* inpolys, r3d_int npolys, r3d_plane plane, r3d_poly* out_pos, r3d_poly* out_neg) {
+
+	// direct access to vertex buffer
+	r3d_int v, np, npnxt, onv, vcur, vnext, vstart, pnext, nright, cside, p;
+	r3d_rvec3 newpos;
+	r3d_int side[R3D_MAX_VERTS];
+	r3d_real sdists[R3D_MAX_VERTS];
+	r3d_int* nverts;
+	r3d_vertex* vertbuffer;
+	r3d_poly* outpolys[2];
+
+	for(p = 0; p < npolys; ++p) {
+
+		nverts = &inpolys[p].nverts;
+		vertbuffer = inpolys[p].verts; 
+		outpolys[0] = &out_pos[p];
+		outpolys[1] = &out_neg[p];
+		if(*nverts <= 0) {
+			memset(&out_pos[p], 0, sizeof(r3d_poly));
+			memset(&out_neg[p], 0, sizeof(r3d_poly));
+			continue;
+		} 
+
+		// calculate signed distances to the clip plane
+		nright = 0;
+		memset(&side, 0, sizeof(side));
+		for(v = 0; v < *nverts; ++v) {
+			sdists[v] = plane.d + dot(vertbuffer[v].pos, plane.n);
+			if(sdists[v] < 0.0) {
+				side[v] = 1;
+				nright++;
+			}
+		}
+	
+		// return if the poly lies entirely on one side of it 
+		if(nright == 0) {
+			out_pos[p] = inpolys[p];
+			memset(&out_neg[p], 0, sizeof(r3d_poly));
+			continue;
+		}
+		if(nright == *nverts) {
+			out_neg[p] = inpolys[p];
+			memset(&out_pos[p], 0, sizeof(r3d_poly));
+			continue;
+		}
+	
+		// check all edges and insert new vertices on the bisected edges 
+		onv = *nverts;
+		for(vcur = 0; vcur < onv; ++vcur) {
+			if(side[vcur]) continue;
+			for(np = 0; np < 3; ++np) {
+				vnext = vertbuffer[vcur].pnbrs[np];
+				if(!side[vnext]) continue;
+				wav(vertbuffer[vcur].pos, -sdists[vnext],
+					vertbuffer[vnext].pos, sdists[vcur],
+					newpos);
+				vertbuffer[*nverts].pos = newpos;
+				vertbuffer[*nverts].pnbrs[0] = vcur;
+				vertbuffer[vcur].pnbrs[np] = *nverts;
+				(*nverts)++;
+				vertbuffer[*nverts].pos = newpos;
+				side[*nverts] = 1;
+				vertbuffer[*nverts].pnbrs[0] = vnext;
+				for(npnxt = 0; npnxt < 3; ++npnxt) 
+					if(vertbuffer[vnext].pnbrs[npnxt] == vcur) break;
+				vertbuffer[vnext].pnbrs[npnxt] = *nverts;
+				(*nverts)++;
+			}
+		}
+	
+		// for each new vert, search around the faces for its new neighbors
+		// and doubly-link everything
+		for(vstart = onv; vstart < *nverts; ++vstart) {
+			vcur = vstart;
+			vnext = vertbuffer[vcur].pnbrs[0];
+			do {
+				for(np = 0; np < 3; ++np) if(vertbuffer[vnext].pnbrs[np] == vcur) break;
+				vcur = vnext;
+				pnext = (np+1)%3;
+				vnext = vertbuffer[vcur].pnbrs[pnext];
+			} while(vcur < onv);
+			vertbuffer[vstart].pnbrs[2] = vcur;
+			vertbuffer[vcur].pnbrs[1] = vstart;
+		}
+	
+		// copy and compress vertices into their new buffers
+		// reusing side[] for reindexing
+		onv = *nverts;
+		outpolys[0]->nverts = 0;
+		outpolys[1]->nverts = 0;
+		for(v = 0; v < onv; ++v) {
+			cside = side[v];
+			outpolys[cside]->verts[outpolys[cside]->nverts] = vertbuffer[v];
+			side[v] = (outpolys[cside]->nverts)++;
+		}
+	
+		for(v = 0; v < outpolys[0]->nverts; ++v) 
+			for(np = 0; np < 3; ++np)
+				outpolys[0]->verts[v].pnbrs[np] = side[outpolys[0]->verts[v].pnbrs[np]];
+		for(v = 0; v < outpolys[1]->nverts; ++v) 
+			for(np = 0; np < 3; ++np)
+				outpolys[1]->verts[v].pnbrs[np] = side[outpolys[1]->verts[v].pnbrs[np]];
+
+	
+	
+	}
+}
+
+
 	
 void r3d_reduce(r3d_poly* poly, r3d_real* moments, r3d_int polyorder) {
 

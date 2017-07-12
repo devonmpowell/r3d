@@ -42,53 +42,52 @@
 
 // --                 unit tests                    -- //
 
-void test_split_tet_thru_centroid() {
+void test_split_tets_thru_centroid() {
 
 	// a very basic sanity check. Splits a tet through its centroid
 	// and checks to see whether the two resulting volumes add up to equal the original
 
 	// variables: the polyhedra and their moments
-	r3d_int m;
+	r3d_int m, i;
 	r3d_rvec3 verts[4];
-	r3d_poly opoly, poly1, poly2;
 	r3d_real om[R3D_NUM_MOMENTS(POLY_ORDER)], m1[R3D_NUM_MOMENTS(POLY_ORDER)], m2[R3D_NUM_MOMENTS(POLY_ORDER)];
+	r3d_plane splane;
 
 	// generate a random tet and clip plane
-	rand_tet_3d(verts, MIN_VOL);
-	r3d_init_tet(&opoly, verts);
-	r3d_plane splane = thru_cent_3d(&opoly);
-
-	// split the poly by making two copies of the original poly
-	// and them clipping them against the same plane, with one
-	// oriented oppositely
-	poly1 = opoly;
-	poly2 = opoly;
-	r3d_clip(&poly1, &splane, 1);
-	splane.n.x *= -1;
-	splane.n.y *= -1;
-	splane.n.z *= -1;
-	splane.d *= -1;
-	r3d_clip(&poly2, &splane, 1);
-
-	// reduce the original and its two parts
-	r3d_reduce(&opoly, om, POLY_ORDER);
-	r3d_reduce(&poly1, m1, POLY_ORDER);
-	r3d_reduce(&poly2, m2, POLY_ORDER);
-
-	// make sure the sum of moments equals the original 
-	for(m = 0; m < R3D_NUM_MOMENTS(POLY_ORDER); ++m) {
-		ASSERT_EQ(om[m], m1[m] + m2[m], TOL_FAIL);
-		EXPECT_EQ(om[m], m1[m] + m2[m], TOL_WARN);
+	r3d_int ntets = 128;
+	r3d_poly opoly[ntets], poly1[ntets], poly2[ntets];
+	for(i = 0; i < ntets; ++i) {
+		rand_tet_3d(verts, MIN_VOL);
+		r3d_init_tet(&opoly[i], verts);
+		if(i == 13)
+			splane = thru_cent_3d(&opoly[i]);
 	}
+
+	// split them all about the same plane
+	r3d_split(opoly, ntets, splane, poly1, poly2);
+
+	for(i = 0; i < ntets; ++i) {
+
+		// reduce the original and its two parts
+		r3d_reduce(&opoly[i], om, POLY_ORDER);
+		r3d_reduce(&poly1[i], m1, POLY_ORDER);
+		r3d_reduce(&poly2[i], m2, POLY_ORDER);
 	
-	// make sure neither of the two resulting volumes is larger than the original
-	// (within some tolerance)
-	ASSERT_LT(m1[0], om[0]*(1.0 + TOL_FAIL));
-	EXPECT_LT(m1[0], om[0]*(1.0 + TOL_WARN));
-	ASSERT_LT(m2[0], om[0]*(1.0 + TOL_FAIL));
-	EXPECT_LT(m2[0], om[0]*(1.0 + TOL_WARN));
+		// make sure the sum of moments equals the original 
+		for(m = 0; m < R3D_NUM_MOMENTS(POLY_ORDER); ++m) {
+			ASSERT_EQ(om[m], m1[m] + m2[m], TOL_FAIL);
+			EXPECT_EQ(om[m], m1[m] + m2[m], TOL_WARN);
+		}
 
-
+		//printf(" original = %f, parts = %f %f, sum = %f\n", om[0], m1[0], m2[0], m1[0]+m2[0]);
+		
+		// make sure neither of the two resulting volumes is larger than the original
+		// (within some tolerance)
+		ASSERT_LT(m1[0], om[0]*(1.0 + TOL_FAIL));
+		EXPECT_LT(m1[0], om[0]*(1.0 + TOL_WARN));
+		ASSERT_LT(m2[0], om[0]*(1.0 + TOL_FAIL));
+		EXPECT_LT(m2[0], om[0]*(1.0 + TOL_WARN));
+	}
 }
 
 void test_split_nonconvex() {
@@ -816,7 +815,7 @@ void test_moments() {
 
 void register_all_tests() {
 
-	register_test(test_split_tet_thru_centroid, "split_tet_thru_centroid");
+	register_test(test_split_tets_thru_centroid, "split_tets_thru_centroid");
 	register_test(test_split_nonconvex, "split_nonconvex");
 	register_test(test_recursive_splitting_nondegenerate, "recursive_splitting_nondegenerate");
 	register_test(test_recursive_splitting_degenerate, "recursive_splitting_degenerate");
