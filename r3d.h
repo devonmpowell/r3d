@@ -113,10 +113,10 @@ typedef struct {
 void r3d_clip(r3d_poly* poly, r3d_plane* planes, r3d_int nplanes);
 
 /**
- * \brief Clip a polyhedron against an arbitrary number of clip planes (find its intersection with a set of half-spaces). 
+ * \brief Splits a list of polyhedra across a single plane.  
  *
  * \param [in] inpolys 
- * Array input polyhedra to be split 
+ * Array of input polyhedra to be split 
  *
  * \param [in] npolys 
  * The number of input polyhedra 
@@ -126,7 +126,10 @@ void r3d_clip(r3d_poly* poly, r3d_plane* planes, r3d_int nplanes);
  *
  * \param[out] out_pos 
  * The output array of fragments on the positive side of the clip plane. Must be at least npolys
- * long. 
+ * long. out_pos[i] and out_neg[i] correspond to inpolys[i], where out_neg[i].nverts or
+ * out.pos[i].nverts are set to zero if the poly lies entirely in the positive or negative side of
+ * the plane, respectively.
+
  *
  * \param[out] out_neg 
  * The output array of fragments on the negitive side of the clip plane. Must be at least npolys

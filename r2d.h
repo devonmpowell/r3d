@@ -111,7 +111,7 @@ typedef struct {
 void r2d_clip(r2d_poly* poly, r2d_plane* planes, r2d_int nplanes);
 
 /**
- * \brief Clip a polygon against an arbitrary number of clip planes (find its intersection with a set of half-spaces). 
+ * \brief Splits a list of polygons across a single plane.  
  *
  * \param [in] inpolys 
  * Array input polyhedra to be split 
@@ -124,7 +124,9 @@ void r2d_clip(r2d_poly* poly, r2d_plane* planes, r2d_int nplanes);
  *
  * \param[out] out_pos 
  * The output array of fragments on the positive side of the clip plane. Must be at least npolys
- * long. 
+ * long. out_pos[i] and out_neg[i] correspond to inpolys[i], where out_neg[i].nverts or
+ * out.pos[i].nverts are set to zero if the poly lies entirely in the positive or negative side of
+ * the plane, respectively.
  *
  * \param[out] out_neg 
  * The output array of fragments on the negitive side of the clip plane. Must be at least npolys
