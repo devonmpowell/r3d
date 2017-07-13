@@ -111,6 +111,29 @@ typedef struct {
 void r2d_clip(r2d_poly* poly, r2d_plane* planes, r2d_int nplanes);
 
 /**
+ * \brief Clip a polygon against an arbitrary number of clip planes (find its intersection with a set of half-spaces). 
+ *
+ * \param [in] inpolys 
+ * Array input polyhedra to be split 
+ *
+ * \param [in] npolys 
+ * The number of input polygons
+ *
+ * \param [in] plane 
+ * The plane about which to split the input polys 
+ *
+ * \param[out] out_pos 
+ * The output array of fragments on the positive side of the clip plane. Must be at least npolys
+ * long. 
+ *
+ * \param[out] out_neg 
+ * The output array of fragments on the negitive side of the clip plane. Must be at least npolys
+ * long. 
+ *
+ */
+void r2d_split(r2d_poly* inpolys, r2d_int npolys, r2d_plane plane, r2d_poly* out_pos, r2d_poly* out_neg);
+
+/**
  * \brief Integrate a polynomial density over a polygon using simplicial decomposition.
  * Uses the fast recursive method of Koehl (2012) to carry out the integration.
  *

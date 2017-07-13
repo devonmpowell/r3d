@@ -53,7 +53,7 @@
 }
 
 // TODO: make this a generic "split" routine that just takes a plane.
-void r2d_split(r2d_poly* inpoly, r2d_poly** outpolys, r2d_real coord, r2d_int ax);
+void r2d_split_coord(r2d_poly* inpoly, r2d_poly** outpolys, r2d_real coord, r2d_int ax);
 
 void r2d_rasterize(r2d_poly* poly, r2d_dvec2 ibox[2], r2d_real* dest_grid, r2d_rvec2 d, r2d_int polyorder) {
 
@@ -113,7 +113,7 @@ void r2d_rasterize(r2d_poly* poly, r2d_dvec2 ibox[2], r2d_real* dest_grid, r2d_r
 		// split the poly and push children to the stack
 		children[0] = &stack[nstack].poly;
 		children[1] = &stack[nstack+1].poly;
-		r2d_split(&stack[nstack].poly, children, d.xy[spax]*(stack[nstack].ibox[0].ij[spax]+dmax/2), spax);
+		r2d_split_coord(&stack[nstack].poly, children, d.xy[spax]*(stack[nstack].ibox[0].ij[spax]+dmax/2), spax);
 		memcpy(stack[nstack+1].ibox, stack[nstack].ibox, 2*sizeof(r2d_dvec2));
 		stack[nstack].ibox[1].ij[spax] -= dmax-dmax/2; 
 		stack[nstack+1].ibox[0].ij[spax] += dmax/2;
@@ -121,7 +121,7 @@ void r2d_rasterize(r2d_poly* poly, r2d_dvec2 ibox[2], r2d_real* dest_grid, r2d_r
 	}
 }
 
-void r2d_split(r2d_poly* inpoly, r2d_poly** outpolys, r2d_real coord, r2d_int ax) {
+void r2d_split_coord(r2d_poly* inpoly, r2d_poly** outpolys, r2d_real coord, r2d_int ax) {
 
 	// direct access to vertex buffer
 	if(inpoly->nverts <= 0) return;
