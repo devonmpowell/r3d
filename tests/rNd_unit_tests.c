@@ -307,7 +307,7 @@ void test_voxelization() {
 	printf("\n");
 	rNd_int nvoxels = 1;
 	for(i = 0; i < RND_DIM; ++i) nvoxels *= ibox[1].ijk[i]-ibox[0].ijk[i];
-	rNd_real* grid = calloc(nvoxels*nmom, sizeof(rNd_real));
+	rNd_real* grid = (rNd_real *) calloc(nvoxels*nmom, sizeof(rNd_real));
 	rNd_voxelize(&poly, ibox, grid, dx, POLY_ORDER);
 
 	// test the sum (volume only for now)

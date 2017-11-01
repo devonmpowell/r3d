@@ -570,7 +570,7 @@ void test_rasterization() {
 	printf("Rasterizing a triangle to a grid with dx = %f %f and moments of order %d\n", dx.x, dx.y, POLY_ORDER);
 	printf("Minimum index box = %d %d to %d %d\n", ibox[0].i, ibox[0].j, ibox[1].i, ibox[1].j);
 	r2d_int npix = (ibox[1].i-ibox[0].i)*(ibox[1].j-ibox[0].j);
-	r2d_real* grid = calloc(npix*nmom, sizeof(r2d_real));
+	r2d_real* grid = (r2d_real *) calloc(npix*nmom, sizeof(r2d_real));
 	r2d_rasterize(&poly, ibox, grid, dx, POLY_ORDER);
 	
 	// make sure the sum of each moment equals the original 
