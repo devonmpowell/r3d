@@ -21,6 +21,8 @@
 #ifndef _R2D_H_
 #define _R2D_H_
 
+extern "C" {
+
 #include <stdint.h>
 
 /**
@@ -315,5 +317,5 @@ void r2d_box_faces_from_verts(r2d_plane* faces, r2d_rvec2* rbounds);
  */
 void r2d_poly_faces_from_verts(r2d_plane* faces, r2d_rvec2* vertices, r2d_int numverts);
 
-
+}
 #endif // _R2D_H_
