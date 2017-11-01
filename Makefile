@@ -15,7 +15,7 @@
 
 ###############################
 
-CC = g++
+CC = gcc
 CFLAGS = -Wall -I. -O3 -shared -fPIC 
 SRC = r3d.c r2d.c rNd.c v3d.c v2d.c vNd.c
 DEPS = r3d.h r2d.h rNd.h v3d.h v2d.h vNd.h Makefile

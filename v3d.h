@@ -46,6 +46,10 @@
 #ifndef _V3D_H_
 #define _V3D_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "r3d.h"
 
 /**
@@ -113,5 +117,9 @@ void r3d_clamp_ibox(r3d_poly* poly, r3d_dvec3 ibox[2], r3d_dvec3 clampbox[2], r3
  *
  */
 void r3d_get_ibox(r3d_poly* poly, r3d_dvec3 ibox[2], r3d_rvec3 d);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _V3D_H_

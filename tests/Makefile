@@ -14,7 +14,7 @@ R3D_SRC = r3d_unit_tests.c
 R2D_SRC = r2d_unit_tests.c 
 RND_SRC = rNd_unit_tests.c 
 
-CC = g++
+CC = gcc
 CFLAGS = -Wall -I.
 R3D_SRC += $(UTEST_HOME)/utest.c test_helpers.c
 R2D_SRC += $(UTEST_HOME)/utest.c test_helpers.c
