@@ -46,6 +46,10 @@
 #ifndef _V2D_H_
 #define _V2D_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "r2d.h"
 
 /**
@@ -113,5 +117,9 @@ void r2d_clamp_ibox(r2d_poly* poly, r2d_dvec2 ibox[2], r2d_dvec2 clampbox[2], r2
  *
  */
 void r2d_get_ibox(r2d_poly* poly, r2d_dvec2 ibox[2], r2d_rvec2 d);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _V2D_H_

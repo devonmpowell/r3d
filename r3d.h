@@ -21,6 +21,10 @@
 #ifndef _R3D_H_
 #define _R3D_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 /**
@@ -374,5 +378,8 @@ void r3d_box_faces_from_verts(r3d_plane* faces, r3d_rvec3* rbounds);
 void r3d_poly_faces_from_verts(r3d_plane* faces, r3d_rvec3* vertices, r3d_int numverts, 
 						r3d_int** faceinds, r3d_int* numvertsperface, r3d_int numfaces);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _R3D_H_

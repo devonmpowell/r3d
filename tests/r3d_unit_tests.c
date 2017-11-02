@@ -738,7 +738,7 @@ void test_voxelization() {
 	printf("Voxelizing a tetrahedron to a grid with dx = %f %f %f and moments of order %d\n", dx.x, dx.y, dx.z, POLY_ORDER);
 	printf("Minimum index box = %d %d %d to %d %d %d\n", ibox[0].i, ibox[0].j, ibox[0].k, ibox[1].i, ibox[1].j, ibox[1].k);
 	r3d_int nvoxels = (ibox[1].i-ibox[0].i)*(ibox[1].j-ibox[0].j)*(ibox[1].k-ibox[0].k);
-	r3d_real* grid = calloc(nvoxels*nmom, sizeof(r3d_real));
+	r3d_real* grid = (r3d_real *) calloc(nvoxels*nmom, sizeof(r3d_real));
 	r3d_voxelize(&poly, ibox, grid, dx, POLY_ORDER);
 	
 	// make sure the sum of each moment equals the original 

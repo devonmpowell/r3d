@@ -22,6 +22,10 @@
 #ifndef _RND_H_
 #define _RND_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 /**
@@ -284,5 +288,8 @@ void rNd_init_box(rNd_poly* poly, rNd_rvec rbounds[2]);
  */
 //void rNd_box_faces_from_verts(rNd_plane* faces, rNd_rvec3* rbounds);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _RND_H_

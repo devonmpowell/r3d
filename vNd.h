@@ -46,6 +46,10 @@
 #ifndef _VND_H_
 #define _VND_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "rNd.h"
 
 /**
@@ -113,5 +117,9 @@ void rNd_clamp_ibox(rNd_poly* poly, rNd_dvec ibox[2], rNd_dvec clampbox[2], rNd_
  *
  */
 void rNd_get_ibox(rNd_poly* poly, rNd_dvec ibox[2], rNd_rvec d);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _VND_H_
