@@ -9,7 +9,7 @@
 ######################################################
 
 # where r3d lives
-R3D_HOME = /home/shevitz/r3d
+R3D_HOME = ..
 
 # what we want to build
 R3D_SRC = test_intersection.cc
