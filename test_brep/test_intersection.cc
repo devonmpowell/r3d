@@ -1,14 +1,12 @@
-#include <iostream>
 #include <math.h>
 #include <stdlib.h>
+#include <iostream>
 #include <vector>
 extern "C" {
 #include "r3d.h"
 }
 
-int main()
-{
-
+int main() {
 #if 0
 
   //////////////////////////////////////////
@@ -647,30 +645,20 @@ int main()
   // have 2 components (tetrahedrons)
   //////////////////////////////////////////
 
-  const r3d_real offset = -1.; // theoretical volume is 1+dimple/3
+  const r3d_real offset = -1.;  // theoretical volume is 1+dimple/3
 
   // start with raw vertices
   r3d_rvec3 vertices[8] = {
-      {0., 0., 0.},
-      {1., 0., 0.},
-      {1., 1., 0.},
-      {0., 1., 0.},
-      {0., 0., 1.},
-      {1., 0., 1. + offset},
-      {1., 1., 1.},
-      {0., 1., 1. + offset},
+      {0., 0., 0.}, {1., 0., 0.},          {1., 1., 0.}, {0., 1., 0.},
+      {0., 0., 1.}, {1., 0., 1. + offset}, {1., 1., 1.}, {0., 1., 1. + offset},
   };
 
   r3d_int nvertices = 8, nfaces = 6;
 
   // define connectivity
-  std::vector<std::vector<r3d_int>> rawinds = {
-      {0, 1, 5, 4},
-      {1, 2, 6, 5},
-      {2, 3, 7, 6},
-      {3, 0, 4, 7},
-      {0, 3, 2, 1},
-      {4, 5, 6, 7}};
+  std::vector<std::vector<r3d_int>> rawinds = {{0, 1, 5, 4}, {1, 2, 6, 5},
+                                               {2, 3, 7, 6}, {3, 0, 4, 7},
+                                               {0, 3, 2, 1}, {4, 5, 6, 7}};
 
   r3d_int numvertsperface[6] = {4, 4, 4, 4, 4, 4};
 
@@ -679,8 +667,7 @@ int main()
 
   // make a double-pointer for the faces
   r3d_int *faceinds[nfaces];
-  for (r3d_int f = 0; f < nfaces; ++f)
-    faceinds[f] = &rawinds[f][0];
+  for (r3d_int f = 0; f < nfaces; ++f) faceinds[f] = &rawinds[f][0];
 
   r3d_init_poly(&poly, vertices, nvertices, faceinds, numvertsperface, nfaces);
 
@@ -695,7 +682,7 @@ int main()
   r3d_free_brep(&brep, numcomponents);
 
   // clip the poly
-  r3d_plane p1 = {{0, 0, 1.}, -.5}; // this convention intersects
+  r3d_plane p1 = {{0, 0, 1.}, -.5};  // this convention intersects
   r3d_clip(&poly, &p1, 1);
 
   // get the volume
