@@ -627,7 +627,7 @@ int main() {
 
 #endif
 
-#if 0
+#if 1
 
 	//////////////////////////////////////////
 	// make a topological cube with a non-planar top

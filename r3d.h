@@ -358,17 +358,41 @@ typedef struct r3d_brep
 } r3d_brep;
 
 /**
- * extract the boundary representation
+ * \brief Convert from R3D's internal vertex-edge format to the boundary
+ * representation.
+ *
+ * \param [in] poly Pointer to a single R3D polyhedron.
+ *
+ * \param [out] brep Pointer to an array of boundary representations that will
+ * hold the different boundary representations for the different components.
+ *
+ * \param [out] numcomponents Pointer to an integer that will hold the number
+ * of determined components.
+ *
  */
 void r3d_init_brep(r3d_poly *poly, r3d_brep **brep, r3d_int *numcomponents);
 
+
 /**
- * print the brep, primarily for debugging purposes
+ * \brief Prints the boundary representation of an array of polyhedons given
+ * in boundary representation form. For debugging.
+ *
+ * \param [in] brep Pointer to an array of boundary representations.
+ *
+ * \param [in] numcomponents The number of disconnected components in the
+ * boundary representation array.
+ *
  */
 void r3d_print_brep(r3d_brep **brep, r3d_int numcomponents);
 
 /**
- * free the brep array
+ * \brief Free all the memory associated with the boundary representation array.
+ *
+ * \param [in] brep  Pointer to an array of boundary representations.
+ *
+ * \param [in] numcomponents  The number of disconnected components in the
+ * boundary representation array.
+ * 
  */
 void r3d_free_brep(r3d_brep **brep, r3d_int numcomponents);
 
