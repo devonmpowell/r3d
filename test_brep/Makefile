@@ -15,7 +15,8 @@ R3D_HOME = ..
 R3D_SRC = test_intersection.cc
 
 # the compiler
-CC = icpc
+CC = g++
+#CC = icpc
 
 # compiler flages
 CFLAGS = -g -Wall -I. -std=c++11
