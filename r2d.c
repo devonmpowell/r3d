@@ -231,7 +231,7 @@ void r2d_reduce(r2d_poly* poly, r2d_real* moments, r2d_int polyorder) {
 	// var declarations
 	r2d_int vcur, vnext, m, i, j, corder;
 	r2d_real twoa;
-	r2d_rvec2 v0, v1; 
+	r2d_rvec2 v0, v1, vc, v0c, v1c;
 
 	// direct access to vertex buffer
 	r2d_vertex* vertbuffer = poly->verts; 
@@ -250,6 +250,30 @@ void r2d_reduce(r2d_poly* poly, r2d_real* moments, r2d_int polyorder) {
 	r2d_real D[polyorder+1][2];
 	r2d_real C[polyorder+1][2];
 
+	// compute the center of the polygon
+	vc.x = 0.0;
+	vc.y = 0.0;
+	for(vcur = 0; vcur < *nverts; ++vcur) {
+		vc.x += vertbuffer[vcur].pos.x;
+		vc.y += vertbuffer[vcur].pos.y;
+	}
+	vc.x /= *nverts;
+	vc.y /= *nverts;
+
+	// calculate volume of the polygon using its center for robustness
+	// iterate over edges and compute a sum over simplices
+	for(vcur = 0; vcur < *nverts; ++vcur) {
+
+		vnext = vertbuffer[vcur].pnbrs[0];
+		v0 = vertbuffer[vcur].pos;
+		v1 = vertbuffer[vnext].pos;
+		v0c.x = v0.x - vc.x;
+		v0c.y = v0.y - vc.y;
+		v1c.x = v1.x - vc.x;
+		v1c.y = v1.y - vc.y;
+		moments[0] += 0.5*(v0c.x*v1c.y - v0c.y*v1c.x);
+	}
+
 	// iterate over edges and compute a sum over simplices 
 	for(vcur = 0; vcur < *nverts; ++vcur) {
 
@@ -258,14 +282,13 @@ void r2d_reduce(r2d_poly* poly, r2d_real* moments, r2d_int polyorder) {
 		v1 = vertbuffer[vnext].pos;
 		twoa = (v0.x*v1.y - v0.y*v1.x); 
 
-		// calculate the moments
+		// calculate the higher moments
 		// using the fast recursive method of Koehl (2012)
 		// essentially building a set of Pascal's triangles, one layer at a time
 
 		// base case
 		D[0][prevlayer] = 1.0;
 		C[0][prevlayer] = 1.0;
-		moments[0] += 0.5*twoa;
 
 		// build up successive polynomial orders
 		for(corder = 1, m = 1; corder <= polyorder; ++corder) {

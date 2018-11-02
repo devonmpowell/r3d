@@ -233,7 +233,7 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
 	r3d_real sixv;
 	r3d_int np, m, i, j, k, corder;
 	r3d_int vstart, pstart, vcur, vnext, pnext;
-	r3d_rvec3 v0, v1, v2;
+	r3d_rvec3 v0, v1, v2, vc, v0c, v1c, v2c ;
 
 	// direct access to vertex buffer
 	r3d_vertex *vertbuffer = poly->verts;
@@ -255,6 +255,70 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
 	r3d_real S[polyorder + 1][polyorder + 1][2];
 	r3d_real D[polyorder + 1][polyorder + 1][2];
 	r3d_real C[polyorder + 1][polyorder + 1][2];
+
+	// loop over all vertices to calculate a polyhedron center
+	vc.x = 0.0;
+	vc.y = 0.0;
+	vc.z = 0.0;
+	for (vcur = 0; vcur < *nverts; ++vcur) {
+		vc.x += vertbuffer[vcur].pos.x;
+		vc.y += vertbuffer[vcur].pos.y;
+		vc.z += vertbuffer[vcur].pos.z;
+	}
+	vc.x /= *nverts;
+	vc.y /= *nverts;
+	vc.z /= *nverts;
+
+	// calculate volume of the polyhedron using its center for robustness
+	// loop over all vertices to find the starting point for each face
+	for (vstart = 0; vstart < *nverts; ++vstart)
+		for (pstart = 0; pstart < 3; ++pstart) {
+			// skip this face if we have marked it
+			if (emarks[vstart][pstart]) continue;
+
+			// initialize face looping
+			pnext = pstart;
+			vcur = vstart;
+			emarks[vcur][pnext] = 1;
+			vnext = vertbuffer[vcur].pnbrs[pnext];
+			v0 = vertbuffer[vcur].pos;
+
+			// move to the second edge
+			for (np = 0; np < 3; ++np)
+				if (vertbuffer[vnext].pnbrs[np] == vcur) break;
+			vcur = vnext;
+			pnext = (np + 1) % 3;
+			emarks[vcur][pnext] = 1;
+			vnext = vertbuffer[vcur].pnbrs[pnext];
+
+			// make a triangle fan using edges and first vertex
+			while (vnext != vstart) {
+				v2 = vertbuffer[vcur].pos;
+				v1 = vertbuffer[vnext].pos;
+				v0c.x = v0.x - vc.x;
+				v0c.y = v0.y - vc.y;
+				v0c.z = v0.z - vc.z;
+				v1c.x = v1.x - vc.x;
+				v1c.y = v1.y - vc.y;
+				v1c.z = v1.z - vc.z;
+				v2c.x = v2.x - vc.x;
+				v2c.y = v2.y - vc.y;
+				v2c.z = v2.z - vc.z;
+				sixv = (-v2c.x * v1c.y * v0c.z + v1c.x * v2c.y * v0c.z + v2c.x * v0c.y * v1c.z -
+						v0c.x * v2c.y * v1c.z - v1c.x * v0c.y * v2c.z + v0c.x * v1c.y * v2c.z);
+				moments[0] += ONE_SIXTH * sixv;
+
+				// move to the next edge
+				for (np = 0; np < 3; ++np)
+					if (vertbuffer[vnext].pnbrs[np] == vcur) break;
+				vcur = vnext;
+				pnext = (np + 1) % 3;
+				emarks[vcur][pnext] = 1;
+				vnext = vertbuffer[vcur].pnbrs[pnext];
+			}
+		}
+
+	memset(&emarks, 0, sizeof(emarks));
 
 	// loop over all vertices to find the starting point for each face
 	for (vstart = 0; vstart < *nverts; ++vstart)
@@ -285,14 +349,13 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
 				sixv = (-v2.x * v1.y * v0.z + v1.x * v2.y * v0.z + v2.x * v0.y * v1.z -
 								v0.x * v2.y * v1.z - v1.x * v0.y * v2.z + v0.x * v1.y * v2.z);
 
-				// calculate the moments using the fast recursive method of Koehl (2012)
+				// calculate the higher moments using the fast recursive method of Koehl (2012)
 				// essentially building a set of trinomial pyramids, one layer at a time
 
 				// base case
 				S[0][0][prevlayer] = 1.0;
 				D[0][0][prevlayer] = 1.0;
 				C[0][0][prevlayer] = 1.0;
-				moments[0] += ONE_SIXTH * sixv;
 
 				// build up successive polynomial orders
 				for (corder = 1, m = 1; corder <= polyorder; ++corder) {
