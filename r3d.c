@@ -269,7 +269,6 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
 	vc.y /= *nverts;
 	vc.z /= *nverts;
 
-	// calculate volume of the polyhedron using its center for robustness
 	// loop over all vertices to find the starting point for each face
 	for (vstart = 0; vstart < *nverts; ++vstart)
 		for (pstart = 0; pstart < 3; ++pstart) {
@@ -295,6 +294,8 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
 			while (vnext != vstart) {
 				v2 = vertbuffer[vcur].pos;
 				v1 = vertbuffer[vnext].pos;
+
+				// calculate volume of the polyhedron using its center for robustness
 				v0c.x = v0.x - vc.x;
 				v0c.y = v0.y - vc.y;
 				v0c.z = v0.z - vc.z;
@@ -304,47 +305,9 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
 				v2c.x = v2.x - vc.x;
 				v2c.y = v2.y - vc.y;
 				v2c.z = v2.z - vc.z;
-				sixv = (-v2c.x * v1c.y * v0c.z + v1c.x * v2c.y * v0c.z + v2c.x * v0c.y * v1c.z -
-						v0c.x * v2c.y * v1c.z - v1c.x * v0c.y * v2c.z + v0c.x * v1c.y * v2c.z);
-				moments[0] += ONE_SIXTH * sixv;
-
-				// move to the next edge
-				for (np = 0; np < 3; ++np)
-					if (vertbuffer[vnext].pnbrs[np] == vcur) break;
-				vcur = vnext;
-				pnext = (np + 1) % 3;
-				emarks[vcur][pnext] = 1;
-				vnext = vertbuffer[vcur].pnbrs[pnext];
-			}
-		}
-
-	memset(&emarks, 0, sizeof(emarks));
-
-	// loop over all vertices to find the starting point for each face
-	for (vstart = 0; vstart < *nverts; ++vstart)
-		for (pstart = 0; pstart < 3; ++pstart) {
-			// skip this face if we have marked it
-			if (emarks[vstart][pstart]) continue;
-
-			// initialize face looping
-			pnext = pstart;
-			vcur = vstart;
-			emarks[vcur][pnext] = 1;
-			vnext = vertbuffer[vcur].pnbrs[pnext];
-			v0 = vertbuffer[vcur].pos;
-
-			// move to the second edge
-			for (np = 0; np < 3; ++np)
-				if (vertbuffer[vnext].pnbrs[np] == vcur) break;
-			vcur = vnext;
-			pnext = (np + 1) % 3;
-			emarks[vcur][pnext] = 1;
-			vnext = vertbuffer[vcur].pnbrs[pnext];
-
-			// make a triangle fan using edges and first vertex
-			while (vnext != vstart) {
-				v2 = vertbuffer[vcur].pos;
-				v1 = vertbuffer[vnext].pos;
+				moments[0] += ONE_SIXTH * (-v2c.x * v1c.y * v0c.z + v1c.x * v2c.y * v0c.z +
+								v2c.x * v0c.y * v1c.z - v0c.x * v2c.y * v1c.z -
+								v1c.x * v0c.y * v2c.z + v0c.x * v1c.y * v2c.z);
 
 				sixv = (-v2.x * v1.y * v0.z + v1.x * v2.y * v0.z + v2.x * v0.y * v1.z -
 								v0.x * v2.y * v1.z - v1.x * v0.y * v2.z + v0.x * v1.y * v2.z);
