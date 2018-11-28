@@ -186,7 +186,7 @@ r2d_rvec2 r2d_poly_center(r2d_poly* poly);
 void r2d_shift_moments(r2d_real* moments, r2d_int polyorder, r2d_rvec2 vc);
 
 /**
- * \brief Adjust moments accordign to the shift of polygon vertices to the orgin.
+ * \brief Adjust moments according to the shift of polygon vertices to the origin.
  *
  * \param [in, out] moments
  * The moments of the shifted polygon.

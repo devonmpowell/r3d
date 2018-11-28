@@ -345,10 +345,10 @@ void r2d_shift_moments(r2d_real* moments, r2d_int polyorder, r2d_rvec2 vc) {
 	}
 
 	// shift moments back to the original position using
-	// \int_\Omega x^i y^j z^k d\vec r =
-	// \int_\omega (x+\xi)^i (y+\eta)^j (z+\zeta)^k d\vec r =
-	// \sum_{a,b,c=0}^{i,j,k} \binom{i}{a} \binom{j}{b} \binom{k}{c}
-	// \xi^{i-a} \eta^{j-b} \zeta^{k-c} \int_\omega x^a y^b z^c d\vec r
+	// \int_\Omega x^i y^j d\vec r =
+	// \int_\omega (x+\xi)^i (y+\eta)^j d\vec r =
+	// \sum_{a,b,c=0}^{i,j,k} \binom{i}{a} \binom{j}{b}
+	// \xi^{i-a} \eta^{j-b} \int_\omega x^a y^b d\vec r
 	for(corder = 1, m = 1; corder <= polyorder; ++corder) {
 		for(i = corder; i >= 0; --i, ++m) {
 			j = corder - i;
@@ -363,7 +363,7 @@ void r2d_shift_moments(r2d_real* moments, r2d_int polyorder, r2d_rvec2 vc) {
 		}
 	}
 
-	// aggign shifted moments
+	// assign shifted moments
 	for(m = 1; m < R2D_NUM_MOMENTS(polyorder); ++m)
 		moments[m] = moments2[m];
 

@@ -229,11 +229,12 @@ void r3d_split(r3d_poly *inpolys, r3d_int npolys, r3d_plane plane,
 }
 
 void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
+
 	// var declarations
 	r3d_real sixv;
 	r3d_int np, m, i, j, k, corder;
 	r3d_int vstart, pstart, vcur, vnext, pnext;
-	r3d_rvec3 v0, v1, v2;
+	r3d_rvec3 v0, v1, v2, vc;
 
 	// direct access to vertex buffer
 	r3d_vertex *vertbuffer = poly->verts;
@@ -243,6 +244,12 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
 	for (m = 0; m < R3D_NUM_MOMENTS(polyorder); ++m) moments[m] = 0.0;
 
 	if (*nverts <= 0) return;
+
+	// flag to translate a polyhedron to the origin for increased accuracy
+	// (this will increase computational cost, in particular for higher moments)
+	r3d_int shift_poly = 1;
+
+	if(shift_poly) vc = r3d_poly_center(poly);
 
 	// for keeping track of which edges have been visited
 	r3d_int emarks[*nverts][3];
@@ -269,6 +276,12 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
 			vnext = vertbuffer[vcur].pnbrs[pnext];
 			v0 = vertbuffer[vcur].pos;
 
+			if(shift_poly) {
+				v0.x = v0.x - vc.x;
+				v0.y = v0.y - vc.y;
+				v0.z = v0.z - vc.z;
+			}
+
 			// move to the second edge
 			for (np = 0; np < 3; ++np)
 				if (vertbuffer[vnext].pnbrs[np] == vcur) break;
@@ -281,6 +294,15 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
 			while (vnext != vstart) {
 				v2 = vertbuffer[vcur].pos;
 				v1 = vertbuffer[vnext].pos;
+
+				if(shift_poly) {
+					v2.x = v2.x - vc.x;
+					v2.y = v2.y - vc.y;
+					v2.z = v2.z - vc.z;
+					v1.x = v1.x - vc.x;
+					v1.y = v1.y - vc.y;
+					v1.z = v1.z - vc.z;
+				}
 
 				sixv = (-v2.x * v1.y * v0.z + v1.x * v2.y * v0.z + v2.x * v0.y * v1.z -
 								v0.x * v2.y * v1.z - v1.x * v0.y * v2.z + v0.x * v1.y * v2.z);
@@ -351,6 +373,85 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
 		curlayer = 1 - curlayer;
 		prevlayer = 1 - prevlayer;
 	}
+
+	if(shift_poly) r3d_shift_moments(moments, polyorder, vc);
+
+}
+
+void r3d_shift_moments(r3d_real* moments, r3d_int polyorder, r3d_rvec3 vc) {
+
+	// var declarations
+	r3d_int m, i, j, k, corder;
+	r3d_int mm, mi, mj, mk, mcorder;
+
+	// store moments of a shifted polygon
+	r3d_real *moments2 = (r3d_real *)malloc(R3D_NUM_MOMENTS(polyorder) * sizeof(r3d_real));
+	for(m = 0; m < R3D_NUM_MOMENTS(polyorder); ++m) {
+		moments2[m] = moments[m];
+	}
+
+	// calculate and save Pascal's triangle
+	r3d_real B[polyorder+1][polyorder+1];
+	B[0][0] = 1.0;
+	for(corder = 1, m = 1; corder <= polyorder; ++corder) {
+		for(i = corder; i >= 0; --i, ++m) {
+			j = corder - i;
+			B[i][corder] = 1.0;
+			if(i > 0 & j > 0) B[i][corder] = B[i][corder-1] + B[i-1][corder-1];
+		}
+	}
+
+	// shift moments back to the original position using
+	// \int_\Omega x^i y^j z^k d\vec r =
+	// \int_\omega (x+\xi)^i (y+\eta)^j (z+\zeta)^k d\vec r =
+	// \sum_{a,b,c=0}^{i,j,k} \binom{i}{a} \binom{j}{b} \binom{k}{c}
+	// \xi^{i-a} \eta^{j-b} \zeta^{k-c} \int_\omega x^a y^b z^c d\vec r
+	for (corder = 1, m = 1; corder <= polyorder; ++corder) {
+		for (i = corder; i >= 0; --i)
+			for (j = corder - i; j >= 0; --j, ++m) {
+				k = corder - i - j;
+				for (mcorder = 0, mm = 0; mcorder <= corder; ++mcorder) {
+					for (mi = mcorder; mi >= 0; --mi)
+						for (mj = mcorder - mi; mj >= 0; --mj, ++mm) {
+							mk = mcorder - mi - mj;
+							if (mi <= i & mj <= j & mk <= k & ((i-mi)+(j-mj)+(k-mk)) > 0 ) {
+								moments2[m] += B[mi][i] * B[mj][j] * B[mk][k] *	pow(vc.x,(i-mi)) *
+										pow(vc.y,(j-mj)) * pow(vc.z,(k-mk)) * moments[mm];
+							}
+						}
+				}
+			}
+	}
+
+	// assign shifted moments
+	for(m = 1; m < R3D_NUM_MOMENTS(polyorder); ++m)
+		moments[m] = moments2[m];
+
+}
+
+r3d_rvec3 r3d_poly_center(r3d_poly* poly) {
+
+	// var declarations
+	r3d_int vcur;
+	r3d_rvec3 vc;
+
+	// direct access to vertex buffer
+	r3d_vertex* vertbuffer = poly->verts;
+	r3d_int* nverts = &poly->nverts;
+
+	vc.x = 0.0;
+	vc.y = 0.0;
+	vc.z = 0.0;
+	for(vcur = 0; vcur < *nverts; ++vcur) {
+		vc.x += vertbuffer[vcur].pos.x;
+		vc.y += vertbuffer[vcur].pos.y;
+		vc.z += vertbuffer[vcur].pos.z;
+	}
+	vc.x /= *nverts;
+	vc.y /= *nverts;
+	vc.z /= *nverts;
+
+	return vc;
 }
 
 r3d_int r3d_is_good(r3d_poly *poly) {
