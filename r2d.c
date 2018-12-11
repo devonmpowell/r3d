@@ -231,7 +231,7 @@ void r2d_reduce(r2d_poly* poly, r2d_real* moments, r2d_int polyorder) {
 	// var declarations
 	r2d_int vcur, vnext, m, i, j, corder;
 	r2d_real twoa;
-	r2d_rvec2 v0, v1; 
+	r2d_rvec2 v0, v1, vc;
 
 	// direct access to vertex buffer
 	r2d_vertex* vertbuffer = poly->verts; 
@@ -242,6 +242,12 @@ void r2d_reduce(r2d_poly* poly, r2d_real* moments, r2d_int polyorder) {
 		moments[m] = 0.0;
 
 	if(*nverts <= 0) return;
+
+	// flag to translate a polygon to the origin for increased accuracy
+	// (this will increase computational cost, in particular for higher moments)
+	r2d_int shift_poly = 1;
+
+	if(shift_poly) vc = r2d_poly_center(poly);
 
 	// Storage for coefficients
 	// keep two layers of the triangle of coefficients
@@ -256,7 +262,15 @@ void r2d_reduce(r2d_poly* poly, r2d_real* moments, r2d_int polyorder) {
 		vnext = vertbuffer[vcur].pnbrs[0];
 		v0 = vertbuffer[vcur].pos;
 		v1 = vertbuffer[vnext].pos;
-		twoa = (v0.x*v1.y - v0.y*v1.x); 
+
+		if(shift_poly) {
+			v0.x = v0.x - vc.x;
+			v0.y = v0.y - vc.y;
+			v1.x = v1.x - vc.x;
+			v1.y = v1.y - vc.y;
+		}
+
+		twoa = (v0.x*v1.y - v0.y*v1.x);
 
 		// calculate the moments
 		// using the fast recursive method of Koehl (2012)
@@ -302,6 +316,79 @@ void r2d_reduce(r2d_poly* poly, r2d_real* moments, r2d_int polyorder) {
 		curlayer = 1 - curlayer;
 		prevlayer = 1 - prevlayer;
 	}
+
+	if(shift_poly) r2d_shift_moments(moments, polyorder, vc);
+
+}
+
+void r2d_shift_moments(r2d_real* moments, r2d_int polyorder, r2d_rvec2 vc) {
+
+	// var declarations
+	r2d_int m, i, j, corder;
+	r2d_int mm, mi, mj, mcorder;
+
+	// store moments of a shifted polygon
+	r2d_real *moments2 = (r2d_real *)malloc(R2D_NUM_MOMENTS(polyorder) * sizeof(r2d_real));
+	for(m = 0; m < R2D_NUM_MOMENTS(polyorder); ++m) {
+		moments2[m] = moments[m];
+	}
+
+	// calculate and save Pascal's triangle
+	r2d_real B[polyorder+1][polyorder+1];
+	B[0][0] = 1.0;
+	for(corder = 1, m = 1; corder <= polyorder; ++corder) {
+		for(i = corder; i >= 0; --i, ++m) {
+			j = corder - i;
+			B[i][corder] = 1.0;
+			if(i > 0 & j > 0) B[i][corder] = B[i][corder-1] + B[i-1][corder-1];
+		}
+	}
+
+	// shift moments back to the original position using
+	// \int_\Omega x^i y^j d\vec r =
+	// \int_\omega (x+\xi)^i (y+\eta)^j d\vec r =
+	// \sum_{a,b,c=0}^{i,j,k} \binom{i}{a} \binom{j}{b}
+	// \xi^{i-a} \eta^{j-b} \int_\omega x^a y^b d\vec r
+	for(corder = 1, m = 1; corder <= polyorder; ++corder) {
+		for(i = corder; i >= 0; --i, ++m) {
+			j = corder - i;
+			for(mcorder = 0, mm = 0; mcorder <= corder; ++mcorder) {
+				for(mi = mcorder; mi >= 0; --mi, ++mm) {
+					mj = mcorder - mi;
+					if (mi <= i & mj <= j & ((i-mi)+(j-mj)) > 0 ) {
+						moments2[m] += B[mi][i] * B[mj][j] * pow(vc.x,(i-mi)) * pow(vc.y,(j-mj)) * moments[mm];
+					}
+				}
+			}
+		}
+	}
+
+	// assign shifted moments
+	for(m = 1; m < R2D_NUM_MOMENTS(polyorder); ++m)
+		moments[m] = moments2[m];
+
+}
+
+r2d_rvec2 r2d_poly_center(r2d_poly* poly) {
+
+	// var declarations
+	r2d_int vcur;
+	r2d_rvec2 vc;
+
+	// direct access to vertex buffer
+	r2d_vertex* vertbuffer = poly->verts;
+	r2d_int* nverts = &poly->nverts;
+
+	vc.x = 0.0;
+	vc.y = 0.0;
+	for(vcur = 0; vcur < *nverts; ++vcur) {
+		vc.x += vertbuffer[vcur].pos.x;
+		vc.y += vertbuffer[vcur].pos.y;
+	}
+	vc.x /= *nverts;
+	vc.y /= *nverts;
+
+	return vc;
 }
 
 r2d_int r2d_is_good(r2d_poly* poly) {

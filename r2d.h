@@ -171,6 +171,34 @@ void r2d_reduce(r2d_poly* poly, r2d_real* moments, r2d_int polyorder);
  * 1 if the polygon is good, 0 if not. 
  *
  */
+r2d_rvec2 r2d_poly_center(r2d_poly* poly);
+
+/**
+ * \brief Calculates a center of a polygon.
+ *
+ * \param [in] poly
+ * The polygon to check.
+ *
+ * \return
+ * coordinates of a polygon center.
+ *
+ */
+void r2d_shift_moments(r2d_real* moments, r2d_int polyorder, r2d_rvec2 vc);
+
+/**
+ * \brief Adjust moments according to the shift of polygon vertices to the origin.
+ *
+ * \param [in, out] moments
+ * The moments of the shifted polygon.
+ *
+ * \param [in] polyorder
+ * Order of the polygon.
+ *
+ * \param [in] vc
+ * Coordinates of the polygon center, which are used to shift the polygon.
+ *
+ */
+
 r2d_int r2d_is_good(r2d_poly* poly);
 
 /**
