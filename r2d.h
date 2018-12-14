@@ -94,7 +94,7 @@ typedef struct {
  * \brief A polygon. Can be convex, nonconvex, even multiply-connected.
  */
 typedef struct {
-#define R2D_MAX_VERTS 64 
+#define R2D_MAX_VERTS 256 
 	r2d_vertex verts[R2D_MAX_VERTS]; /*!< Vertex buffer. */
 	r2d_int nverts; /*!< Number of vertices in the buffer. */
 } r2d_poly;
