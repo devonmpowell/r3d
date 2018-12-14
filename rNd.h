@@ -93,7 +93,7 @@ typedef struct {
  * \brief An `RND_DIM`-dimensional polytope.
  */
 typedef struct {
-#define RND_MAX_VERTS 256 
+#define RND_MAX_VERTS 1024 
 	rNd_vertex verts[RND_MAX_VERTS]; /*!< Vertex buffer. */
 	rNd_int nverts, nfaces; /*!< Number of vertices and faces. */
 } rNd_poly;

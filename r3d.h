@@ -92,7 +92,7 @@ typedef struct
  */
 typedef struct
 {
-#define R3D_MAX_VERTS 128
+#define R3D_MAX_VERTS 512
   r3d_vertex verts[R3D_MAX_VERTS]; /*!< Vertex buffer. */
   r3d_int nverts;                  /*!< Number of vertices in the buffer. */
 } r3d_poly;
