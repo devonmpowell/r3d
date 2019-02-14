@@ -385,10 +385,8 @@ void r3d_shift_moments(r3d_real* moments, r3d_int polyorder, r3d_rvec3 vc) {
 	r3d_int mm, mi, mj, mk, mcorder;
 
 	// store moments of a shifted polygon
-	r3d_real *moments2 = (r3d_real *)malloc(R3D_NUM_MOMENTS(polyorder) * sizeof(r3d_real));
-	for(m = 0; m < R3D_NUM_MOMENTS(polyorder); ++m) {
-		moments2[m] = moments[m];
-	}
+	r3d_real moments2[R3D_NUM_MOMENTS(polyorder)];
+	for (m = 0; m < R3D_NUM_MOMENTS(polyorder); ++m) moments2[m] = 0.0;
 
 	// calculate and save Pascal's triangle
 	r3d_real B[polyorder+1][polyorder+1];
@@ -414,7 +412,7 @@ void r3d_shift_moments(r3d_real* moments, r3d_int polyorder, r3d_rvec3 vc) {
 					for (mi = mcorder; mi >= 0; --mi)
 						for (mj = mcorder - mi; mj >= 0; --mj, ++mm) {
 							mk = mcorder - mi - mj;
-							if (mi <= i & mj <= j & mk <= k & ((i-mi)+(j-mj)+(k-mk)) > 0 ) {
+							if (mi <= i & mj <= j & mk <= k ) {
 								moments2[m] += B[mi][i] * B[mj][j] * B[mk][k] *	pow(vc.x,(i-mi)) *
 										pow(vc.y,(j-mj)) * pow(vc.z,(k-mk)) * moments[mm];
 							}
@@ -426,7 +424,6 @@ void r3d_shift_moments(r3d_real* moments, r3d_int polyorder, r3d_rvec3 vc) {
 	// assign shifted moments
 	for(m = 1; m < R3D_NUM_MOMENTS(polyorder); ++m)
 		moments[m] = moments2[m];
-
 }
 
 r3d_rvec3 r3d_poly_center(r3d_poly* poly) {
