@@ -138,9 +138,8 @@ void r3d_split_coord(r3d_poly* inpoly, r3d_poly** outpolys, r3d_real coord, r3d_
 	nright = 0;
 	memset(&side, 0, sizeof(side));
 	for(v = 0; v < *nverts; ++v) {
-			//sdists[v] = splane.d + r3d_dot(vertbuffer[v].pos, splane.n);
-		sdists[v] = coord - vertbuffer[v].pos.xyz[ax];
-		if(sdists[v] < 0.0) {
+		sdists[v] = vertbuffer[v].pos.xyz[ax] - coord;
+		if(sdists[v] > 0.0) {
 			side[v] = 1;
 			nright++;
 		}
@@ -242,7 +241,7 @@ void r3d_clamp_ibox(r3d_poly* poly, r3d_dvec3 ibox[2], r3d_dvec3 clampbox[2], r3
 	memset(boxfaces, 0, sizeof(boxfaces));
 	for(i = 0; i < 3; ++i) {
 		if(ibox[1].ijk[i] <= clampbox[0].ijk[i] || ibox[0].ijk[i] >= clampbox[1].ijk[i]) {
-			memset(ibox, 0, sizeof(ibox));
+			memset(ibox, 0, 2*sizeof(r3d_dvec3));
 			poly->nverts = 0;
 			return;
 		}

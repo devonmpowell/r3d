@@ -271,7 +271,7 @@ void rNd_clamp_ibox(rNd_poly* poly, rNd_dvec ibox[2], rNd_dvec clampbox[2], rNd_
 	memset(boxfaces, 0, sizeof(boxfaces));
 	for(i = 0; i < RND_DIM; ++i) {
 		if(ibox[1].ijk[i] <= clampbox[0].ijk[i] || ibox[0].ijk[i] >= clampbox[1].ijk[i]) {
-			memset(ibox, 0, sizeof(ibox));
+			memset(ibox, 0, 2*sizeof(rNd_dvec));
 			poly->nverts = 0;
 			return;
 		}

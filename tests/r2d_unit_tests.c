@@ -541,7 +541,7 @@ void test_rasterization() {
 
 #undef POLY_ORDER
 #define POLY_ORDER 3
-#define NGRID 17
+#define NGRID 31 
 
 	// vars
 	r2d_int i, v, curorder, mind;
@@ -572,6 +572,23 @@ void test_rasterization() {
 	r2d_int npix = (ibox[1].i-ibox[0].i)*(ibox[1].j-ibox[0].j);
 	r2d_real* grid = (r2d_real *) calloc(npix*nmom, sizeof(r2d_real));
 	r2d_rasterize(&poly, ibox, grid, dx, POLY_ORDER);
+
+	// print out an ASCII check of the rasterization
+	r2d_int ii, jj;
+	r2d_int ni = ibox[1].i-ibox[0].i;
+	r2d_int nj = ibox[1].j-ibox[0].j;
+	for(ii = 0; ii < ni; ++ii) {
+		for(jj = 0; jj < nj; ++jj) {
+			if(grid[nmom*(nj*ii+jj)+0] > 0.8*dx.x*dx.y)
+				printf("X");
+			else if(grid[nmom*(nj*ii+jj)+0] > 0.0)
+				printf(".");
+			else
+				printf(" ");
+		}
+		printf("\n");
+	}
+
 	
 	// make sure the sum of each moment equals the original 
 	for(curorder = 0, mind = 0; curorder <= POLY_ORDER; ++curorder) {
@@ -588,8 +605,6 @@ void test_rasterization() {
 	}
 	free(grid);
 }
-
-
 
 
 void test_moments() {

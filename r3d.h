@@ -23,6 +23,7 @@
 #define _R3D_H_
 
 #include <stdint.h>
+#include <stdlib.h>
 
 /**
  * \file r3d.h \author Devon Powell \date 31 August 2015 \brief Interface for

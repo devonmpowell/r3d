@@ -337,7 +337,7 @@ void r2d_shift_moments(r2d_real* moments, r2d_int polyorder, r2d_rvec2 vc) {
 		for(i = corder; i >= 0; --i, ++m) {
 			j = corder - i;
 			B[i][corder] = 1.0;
-			if(i > 0 & j > 0) B[i][corder] = B[i][corder-1] + B[i-1][corder-1];
+			if(i > 0 && j > 0) B[i][corder] = B[i][corder-1] + B[i-1][corder-1];
 		}
 	}
 
@@ -352,7 +352,7 @@ void r2d_shift_moments(r2d_real* moments, r2d_int polyorder, r2d_rvec2 vc) {
 			for(mcorder = 0, mm = 0; mcorder <= corder; ++mcorder) {
 				for(mi = mcorder; mi >= 0; --mi, ++mm) {
 					mj = mcorder - mi;
-					if (mi <= i & mj <= j ) {
+					if (mi <= i && mj <= j ) {
 						moments2[m] += B[mi][i] * B[mj][j] * pow(vc.x,(i-mi)) * pow(vc.y,(j-mj)) * moments[mm];
 					}
 				}

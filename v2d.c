@@ -115,8 +115,12 @@ void r2d_rasterize(r2d_poly* poly, r2d_dvec2 ibox[2], r2d_real* dest_grid, r2d_r
 		children[1] = &stack[nstack+1].poly;
 		r2d_split_coord(&stack[nstack].poly, children, d.xy[spax]*(stack[nstack].ibox[0].ij[spax]+dmax/2), spax);
 		memcpy(stack[nstack+1].ibox, stack[nstack].ibox, 2*sizeof(r2d_dvec2));
+		//stack[nstack].ibox[0].ij[spax] += dmax/2;
+		//stack[nstack+1].ibox[1].ij[spax] -= dmax-dmax/2; 
+
 		stack[nstack].ibox[1].ij[spax] -= dmax-dmax/2; 
 		stack[nstack+1].ibox[0].ij[spax] += dmax/2;
+
 		nstack += 2;
 	}
 }
@@ -136,10 +140,8 @@ void r2d_split_coord(r2d_poly* inpoly, r2d_poly** outpolys, r2d_real coord, r2d_
 	nright = 0;
 	memset(&side, 0, sizeof(side));
 	for(v = 0; v < *nverts; ++v) {
-			//sdists[v] = splane.d + r2d_dot(vertbuffer[v].pos, splane.n);
-		sdists[v] = coord - vertbuffer[v].pos.xy[ax];
-		sdists[v] *= -1;
-		if(sdists[v] < 0.0) {
+		sdists[v] = vertbuffer[v].pos.xy[ax] - coord;
+		if(sdists[v] > 0.0) {
 			side[v] = 1;
 			nright++;
 		}
@@ -238,7 +240,7 @@ void r2d_clamp_ibox(r2d_poly* poly, r2d_dvec2 ibox[2], r2d_dvec2 clampbox[2], r2
 	memset(boxfaces, 0, sizeof(boxfaces));
 	for(i = 0; i < 2; ++i) {
 		if(ibox[1].ij[i] <= clampbox[0].ij[i] || ibox[0].ij[i] >= clampbox[1].ij[i]) {
-			memset(ibox, 0, sizeof(ibox));
+			memset(ibox, 0, 2*sizeof(r2d_dvec2));
 			poly->nverts = 0;
 			return;
 		}

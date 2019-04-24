@@ -395,7 +395,7 @@ void r3d_shift_moments(r3d_real* moments, r3d_int polyorder, r3d_rvec3 vc) {
 		for(i = corder; i >= 0; --i, ++m) {
 			j = corder - i;
 			B[i][corder] = 1.0;
-			if(i > 0 & j > 0) B[i][corder] = B[i][corder-1] + B[i-1][corder-1];
+			if(i > 0 && j > 0) B[i][corder] = B[i][corder-1] + B[i-1][corder-1];
 		}
 	}
 
@@ -412,7 +412,7 @@ void r3d_shift_moments(r3d_real* moments, r3d_int polyorder, r3d_rvec3 vc) {
 					for (mi = mcorder; mi >= 0; --mi)
 						for (mj = mcorder - mi; mj >= 0; --mj, ++mm) {
 							mk = mcorder - mi - mj;
-							if (mi <= i & mj <= j & mk <= k ) {
+							if (mi <= i && mj <= j && mk <= k ) {
 								moments2[m] += B[mi][i] * B[mj][j] * B[mk][k] *	pow(vc.x,(i-mi)) *
 										pow(vc.y,(j-mj)) * pow(vc.z,(k-mk)) * moments[mm];
 							}
@@ -704,7 +704,7 @@ void r3d_init_poly(r3d_poly *poly, r3d_rvec3 *vertices, r3d_int numverts,
 									 r3d_int **faceinds, r3d_int *numvertsperface,
 									 r3d_int numfaces) {
 	// dummy vars
-	r3d_int v, vprev, vcur, vcur_old, vnext, f, np;
+	r3d_int v, vprev, vcur, vnext, f, np;
 
 	// direct access to vertex buffer
 	r3d_vertex *vertbuffer = poly->verts;
@@ -1024,7 +1024,7 @@ void r3d_init_brep(r3d_poly *poly, r3d_brep **brep, r3d_int *numcomponents) {
 	r3d_vertex *vertbuffer = poly->verts;
 
 	// locals
-	r3d_int nc = 0, i, np, nv, nf, pnext, vstart, vcur, vnext, pedge, nvkept,
+	r3d_int nc = 0, i, np, nv, nf, vstart, vcur, vnext, pedge, nvkept,
 					numvertsincomponent, j;
 
 	// make the mapping of equivalent vertex indices
