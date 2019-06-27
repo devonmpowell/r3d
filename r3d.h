@@ -167,7 +167,7 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder);
  * \return 1 if the polyhedron is good, 0 if not.
  *
  */
-r3d_rvec3 r3d_poly_center(r3d_poly* poly);
+r3d_int r3d_is_good(r3d_poly *poly);
 
 /**
  * \brief Calculates a center of a polyhedron.
@@ -179,7 +179,7 @@ r3d_rvec3 r3d_poly_center(r3d_poly* poly);
  * coordinates of a polygon center.
  *
  */
-void r3d_shift_moments(r3d_real* moments, r3d_int polyorder, r3d_rvec3 vc);
+r3d_rvec3 r3d_poly_center(r3d_poly* poly);
 
 /**
  * \brief Adjust moments according to the shift of polyhedron vertices to the origin.
@@ -194,8 +194,7 @@ void r3d_shift_moments(r3d_real* moments, r3d_int polyorder, r3d_rvec3 vc);
  * Coordinates of the polygon center, which are used to shift the polygon.
  *
  */
-
-r3d_int r3d_is_good(r3d_poly *poly);
+void r3d_shift_moments(r3d_real* moments, r3d_int polyorder, r3d_rvec3 vc);
 
 /**
  * \brief Get the signed volume of the tetrahedron defined by the input
