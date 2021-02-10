@@ -108,8 +108,9 @@ typedef struct
  *
  * \param[in] nplanes The number of planes in the input array.
  *
+ * \return Status code indicating if operation was successful (1 - successful, 0 - unsuccessful)
  */
-void r3d_clip(r3d_poly *poly, r3d_plane *planes, r3d_int nplanes);
+int r3d_clip(r3d_poly *poly, r3d_plane *planes, r3d_int nplanes);
 
 /**
  * \brief Splits a list of polyhedra across a single plane.
@@ -130,8 +131,9 @@ void r3d_clip(r3d_poly *poly, r3d_plane *planes, r3d_int nplanes);
  * \param[out] out_neg The output array of fragments on the negitive side of the
  * clip plane. Must be at least npolys long.
  *
+ * \return Status code indicating if operation was successful (1 - successful, 0 - unsuccessful)
  */
-void r3d_split(r3d_poly *inpolys, r3d_int npolys, r3d_plane plane,
+int r3d_split(r3d_poly *inpolys, r3d_int npolys, r3d_plane plane,
                r3d_poly *out_pos, r3d_poly *out_neg);
 
 /**
@@ -319,7 +321,7 @@ void r3d_init_box(r3d_poly *poly, r3d_rvec3 *rbounds);
  * \param [in] numfaces Number of faces in the input polyhedron.
  *
  */
-void r3d_init_poly(r3d_poly *poly, r3d_rvec3 *vertices, r3d_int numverts,
+int r3d_init_poly(r3d_poly *poly, r3d_rvec3 *vertices, r3d_int numverts,
                    r3d_int **faceinds, r3d_int *numvertsperface,
                    r3d_int numfaces);
 
