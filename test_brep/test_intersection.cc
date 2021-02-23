@@ -31,7 +31,7 @@ int main() {
 
 #endif
 
-#if 0
+        {
 
 	//////////////////////////////////////////
 	// planes
@@ -49,22 +49,22 @@ int main() {
 	std::cout << "plane 2 " << plane2.n.xyz[0] << " " << plane2.n.xyz[1] 
 		<< " " << plane2.n.xyz[2] << " " << std::endl;
 
-#endif
+        }
 
-#if 0
+        {
 
 	//////////////////////////////////////////
 	// vertices, It is unlikely we will ever call this directly. It is created
 	// automatically by helper functions like r3d_init_tet
 	//////////////////////////////////////////
 
-	r3d_vertex vertex = {{0, 1., 2}, {5., 6., 7.}};
+	r3d_vertex vertex = {{0, 1, 2}, {5, 6, 7}};
 	std::cout << "vertex " << vertex.pos.x << " " << vertex.pos.y << " "
 		<< vertex.pos.z << " " << std::endl;
 
-#endif
+        }
 
-#if 0
+        {
 	//////////////////////////////////////////
 	// tetrahedron, test clip
 	//////////////////////////////////////////
@@ -85,10 +85,10 @@ int main() {
 	std::cout << std::endl;
 
 	r3d_int numcomponents;
-	r3d_brep *brep;
+	r3d_brep **brep;
 	r3d_init_brep(&poly, &brep, &numcomponents);
-	r3d_print_brep(&brep, numcomponents);
-	r3d_free_brep(&brep, numcomponents);
+	r3d_print_brep(brep, numcomponents);
+	r3d_free_brep(brep, numcomponents);
 
 	// clip the poly
 	// the definition of the plane is n.v+d=0, which is why d needs to be negative
@@ -99,12 +99,13 @@ int main() {
 	std::cout << std::endl;
 
 	r3d_init_brep(&poly, &brep, &numcomponents);
-	r3d_print_brep(&brep, numcomponents);
-	r3d_free_brep(&brep, numcomponents);
+	r3d_print_brep(brep, numcomponents);
+	r3d_free_brep(brep, numcomponents);
 
-#endif
+        r3d_free(&poly);
+        }
 
-#if 0
+        {
 
 	//////////////////////////////////////////
 	// tetrahedron, test split
@@ -141,9 +142,12 @@ int main() {
 	std::cout << "neg" << std::endl;
 	r3d_print(&out_neg);
 
-#endif
+        r3d_free(&poly);
+        r3d_free(&out_pos);
+        r3d_free(&out_neg);
+        }
 
-#if 0
+        {
 
 	//////////////////////////////////////////
 	// make a cube, the easiest way is to make a bound box
@@ -164,14 +168,15 @@ int main() {
 	std::cout << std::endl;
 
 	r3d_int numcomponents;
-	r3d_brep *brep;
+	r3d_brep **brep;
 	r3d_init_brep(&poly, &brep, &numcomponents);
-	r3d_print_brep(&brep, numcomponents);
-	r3d_free_brep(&brep, numcomponents);
+	r3d_print_brep(brep, numcomponents);
+	r3d_free_brep(brep, numcomponents);
 
-#endif
+        r3d_free(&poly);
+        }
 
-#if 0
+        {
 
 	//////////////////////////////////////////
 	// make a cube, using the r3d_init_poly interface
@@ -212,14 +217,15 @@ int main() {
 	std::cout << std::endl;
 
 	r3d_int numcomponents;
-	r3d_brep *brep;
+	r3d_brep **brep;
 	r3d_init_brep(&poly, &brep, &numcomponents);
-	r3d_print_brep(&brep, numcomponents);
-	r3d_free_brep(&brep, numcomponents);
+	r3d_print_brep(brep, numcomponents);
+	r3d_free_brep(brep, numcomponents);
 
-#endif
+        r3d_free(&poly);
+        }
 
-#if 0
+        {
 
 	//////////////////////////////////////////
 	// make a cube, using the r3d_poly interface with list initialization and
@@ -268,14 +274,15 @@ int main() {
 	std::cout << std::endl;
 
 	r3d_int numcomponents;
-	r3d_brep *brep;
+	r3d_brep **brep;
 	r3d_init_brep(&poly, &brep, &numcomponents);
-	r3d_print_brep(&brep, numcomponents);
-	r3d_free_brep(&brep, numcomponents);
+	r3d_print_brep(brep, numcomponents);
+	r3d_free_brep(brep, numcomponents);
 
-#endif
+        r3d_free(&poly);
+        }
 
-#if 0
+        {
 
 	//////////////////////////////////////////
 	// cube, test split
@@ -296,10 +303,10 @@ int main() {
 	std::cout << std::endl;
 
 	r3d_int numcomponents;
-	r3d_brep *brep;
+	r3d_brep **brep;
 	r3d_init_brep(&poly, &brep, &numcomponents);
-	r3d_print_brep(&brep, numcomponents);
-	r3d_free_brep(&brep, numcomponents);
+	r3d_print_brep(brep, numcomponents);
+	r3d_free_brep(brep, numcomponents);
 
 	// define the plane
 	// the definition of the plane is n.v+d=0, which is why d needs to be negative
@@ -314,8 +321,8 @@ int main() {
 	std::cout << std::endl;
 
 	r3d_init_brep(&out_pos, &brep, &numcomponents);
-	r3d_print_brep(&brep, numcomponents);
-	r3d_free_brep(&brep, numcomponents);
+	r3d_print_brep(brep, numcomponents);
+	r3d_free_brep(brep, numcomponents);
 	std::cout << std::endl;
 
 	std::cout << "out_neg" << std::endl;
@@ -323,12 +330,15 @@ int main() {
 	std::cout << std::endl;
 
 	r3d_init_brep(&out_neg, &brep, &numcomponents);
-	r3d_print_brep(&brep, numcomponents);
-	r3d_free_brep(&brep, numcomponents);
+	r3d_print_brep(brep, numcomponents);
+	r3d_free_brep(brep, numcomponents);
 
-#endif
+        r3d_free(&poly);
+        r3d_free(&out_pos);
+        r3d_free(&out_neg);
+        }
 
-#if 0
+        {
 
 	//////////////////////////////////////////
 	// make a double cube and intersect with a plane so it cuts both cubes
@@ -396,10 +406,10 @@ int main() {
 		<< " and has volume " << volume << std::endl << std::endl;
 
 	r3d_int numcomponents;
-	r3d_brep *brep;
+	r3d_brep **brep;
 	r3d_init_brep(&poly, &brep, &numcomponents);
-	r3d_print_brep(&brep, numcomponents);
-	r3d_free_brep(&brep, numcomponents);
+	r3d_print_brep(brep, numcomponents);
+	r3d_free_brep(brep, numcomponents);
 
 	// clip in the z normal direction, should be the upper half of two cubes
 	r3d_plane p1 = {{0, 0, 1.}, -.5}; 
@@ -416,12 +426,13 @@ int main() {
 	std::cout << std::endl;
 
 	r3d_init_brep(&poly, &brep, &numcomponents);
-	r3d_print_brep(&brep, numcomponents);
-	r3d_free_brep(&brep, numcomponents);
+	r3d_print_brep(brep, numcomponents);
+	r3d_free_brep(brep, numcomponents);
 
-#endif
+        r3d_free(&poly);
+        }
 
-#if 0
+        {
 
 	//////////////////////////////////////////
 	// make a dimpled cube
@@ -479,10 +490,10 @@ int main() {
 		<< volume << std::endl << std::endl;
 
 	r3d_int numcomponents;
-	r3d_brep *brep;
+	r3d_brep **brep;
 	r3d_init_brep(&poly, &brep, &numcomponents);
-	r3d_print_brep(&brep, numcomponents);
-	r3d_free_brep(&brep, numcomponents);
+	r3d_print_brep(brep, numcomponents);
+	r3d_free_brep(brep, numcomponents);
 
 	// clip in the z normal direction,
 	r3d_plane p1 = {{0, 0, 1.}, -.5};
@@ -499,12 +510,13 @@ int main() {
 	std::cout << std::endl;
 
 	r3d_init_brep(&poly, &brep, &numcomponents);
-	r3d_print_brep(&brep, numcomponents);
-	r3d_free_brep(&brep, numcomponents);
+	r3d_print_brep(brep, numcomponents);
+	r3d_free_brep(brep, numcomponents);
 
-#endif
+        r3d_free(&poly);
+        }
 
-#if 0
+        {
 
 	//////////////////////////////////////////
 	// make a pyramid with an octagonal base
@@ -555,14 +567,15 @@ int main() {
 	std::cout << std::endl;
 
 	r3d_int numcomponents;
-	r3d_brep *brep;
+	r3d_brep **brep;
 	r3d_init_brep(&poly, &brep, &numcomponents);
-	r3d_print_brep(&brep, numcomponents);
-	r3d_free_brep(&brep, numcomponents);
+	r3d_print_brep(brep, numcomponents);
+	r3d_free_brep(brep, numcomponents);
 
-#endif
+        r3d_free(&poly);
+        }
 
-#if 0
+        {
 
 	//////////////////////////////////////////
 	// make a double pyramid with an octagonal center
@@ -620,14 +633,15 @@ int main() {
 	std::cout << std::endl;
 
 	r3d_int numcomponents;
-	r3d_brep *brep;
+	r3d_brep **brep;
 	r3d_init_brep(&poly, &brep, &numcomponents);
-	r3d_print_brep(&brep, numcomponents);
-	r3d_free_brep(&brep, numcomponents);
+	r3d_print_brep(brep, numcomponents);
+	r3d_free_brep(brep, numcomponents);
 
-#endif
+        r3d_free(&poly);
+        }
 
-#if 1
+        {
 
 	//////////////////////////////////////////
 	// make a topological cube with a non-planar top
@@ -677,10 +691,10 @@ int main() {
 	std::cout << std::endl;
 
 	r3d_int numcomponents;
-	r3d_brep *brep;
+	r3d_brep **brep;
 	r3d_init_brep(&poly, &brep, &numcomponents);
-	r3d_print_brep(&brep, numcomponents);
-	r3d_free_brep(&brep, numcomponents);
+	r3d_print_brep(brep, numcomponents);
+	r3d_free_brep(brep, numcomponents);
 
 	// clip the poly
 	r3d_plane p1 = {{0, 0, 1.}, -.5};
@@ -688,7 +702,7 @@ int main() {
 
 	// get the volume
 	r3d_real volume;
-	r3d_reduce(&poly, &volume, 1);
+	r3d_reduce(&poly, &volume, 0);
 
 	std::cout << "\nclipped poly is good: " << r3d_is_good(&poly)
 		<< " and has volume " << volume << std::endl << std::endl;
@@ -698,10 +712,11 @@ int main() {
 	std::cout << std::endl;
 
 	r3d_init_brep(&poly, &brep, &numcomponents);
-	r3d_print_brep(&brep, numcomponents);
-	r3d_free_brep(&brep, numcomponents);
+	r3d_print_brep(brep, numcomponents);
+	r3d_free_brep(brep, numcomponents);
 
-#endif
+        r3d_free(&poly);
+        }
 
 	return 0;
 }
