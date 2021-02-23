@@ -93,9 +93,9 @@ typedef struct
  */
 typedef struct
 {
-#define R3D_MAX_VERTS 512
-  r3d_vertex verts[R3D_MAX_VERTS]; /*!< Vertex buffer. */
+  r3d_vertex *verts;               /*!< Vertex buffer. */
   r3d_int nverts;                  /*!< Number of vertices in the buffer. */
+  r3d_int maxverts;
 } r3d_poly;
 
 /**
@@ -115,7 +115,7 @@ int r3d_clip(r3d_poly *poly, r3d_plane *planes, r3d_int nplanes);
 /**
  * \brief Splits a list of polyhedra across a single plane.
  *
- * \param [in] inpolys Array of input polyhedra to be split
+ * \param [in] inpolys Array of input polyhedra to be split (\warning input polyhedra are modified)
  *
  * \param [in] npolys The number of input polyhedra
  *
@@ -280,6 +280,38 @@ void r3d_shear(r3d_poly *poly, r3d_real shear, r3d_int axb, r3d_int axs);
 void r3d_affine(r3d_poly *poly, r3d_real mat[4][4]);
 
 /**
+ * \brief Initialize a empty/blank polyhedron
+ *
+ * \param [out] poly The polyhedron to initialize.
+ *
+ * \param [in] nvalloc Number of vertices we reserve space for
+ *
+ */
+int r3d_init_blank(r3d_poly *poly, r3d_int nvalloc);
+
+/**
+ * \brief Initialize a polygon from another polygon
+ *
+ * \param [out] destpoly The polyhedron to initialize.
+ * \param [in] srcpoly The polyhedron from which to initialize.
+ *
+ * \note memory for vertex buffers in destpoly will be allocated
+ * inside routine as it cannot know if the buffer is allocated or set
+ * to some uninitialized value
+ */
+int r3d_copy(r3d_poly *destpoly, r3d_poly *srcpoly);
+
+/**
+ * \brief Free memory allocated in polyhedron
+ *
+ * \param [in] poly The polyhedron to free
+ *
+ * Behavior is undefined if memory for vertex buffer in polyhedron is
+ * uninitialized
+ */
+void r3d_free(r3d_poly *poly);
+
+/**
  * \brief Initialize a polyhedron as a tetrahedron.
  *
  * \param [out] poly The polyhedron to initialize.
@@ -288,7 +320,7 @@ void r3d_affine(r3d_poly *poly, r3d_real mat[4][4]);
  * tetrahedron.
  *
  */
-void r3d_init_tet(r3d_poly *poly, r3d_rvec3 *verts);
+int r3d_init_tet(r3d_poly *poly, r3d_rvec3 *verts);
 
 /**
  * \brief Initialize a polyhedron as an axis-aligned cube.
@@ -299,7 +331,7 @@ void r3d_init_tet(r3d_poly *poly, r3d_rvec3 *verts);
  * corners of the box.
  *
  */
-void r3d_init_box(r3d_poly *poly, r3d_rvec3 *rbounds);
+int r3d_init_box(r3d_poly *poly, r3d_rvec3 *rbounds);
 
 /**
  * \brief Initialize a general polyhedron from a full boundary description. Can
@@ -393,14 +425,14 @@ typedef struct r3d_brep
  *
  * \param [in] poly Pointer to a single R3D polyhedron.
  *
- * \param [out] brep Pointer to an array of boundary representations that will
- * hold the different boundary representations for the different components.
+ * \param [out] brep Pointer to an array of pointers to boundary representation
+ * (each entry in the array is a pointer to the brep of a polyhedral component)
  *
  * \param [out] numcomponents Pointer to an integer that will hold the number
  * of determined components.
  *
  */
-void r3d_init_brep(r3d_poly *poly, r3d_brep **brep, r3d_int *numcomponents);
+void r3d_init_brep(r3d_poly *poly, r3d_brep ***brep, r3d_int *numcomponents);
 
 
 /**
