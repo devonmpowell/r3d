@@ -1,0 +1,34 @@
+#-----------------------------------------------------------------------------
+# R3D configuration file template
+#-----------------------------------------------------------------------------
+
+# Compiler Definitions
+set(CMAKE_C_COMPILER @CMAKE_C_COMPILER@ CACHE FILEPATH "C Compiler used for compiling R3D")
+
+# R3D installation path
+set(r3d_ROOT @CMAKE_INSTALL_PREFIX@ CACHE PATH "Path to R3D installation")
+
+# R3D library 
+set(r3d_LIBRARIES @r3d_LIBRARIES@ CACHE STRING "Name of the R3D library")
+
+# R3D includes
+set(r3d_INCLUDE_DIR @CMAKE_INSTALL_PREFIX@/include CACHE PATH "R3D include file locations")
+
+# R3D options
+set(R3D_MAX_VERTS @R3D_MAX_VERTS@ CACHE STRING "Max verts in R3D polyhedron")
+
+
+if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.12)
+  cmake_policy(SET CMP0074 NEW)  # find_package honors Pkg_ROOT variables 
+endif ()
+
+if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.15)
+  set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)  # search for PkgConfig.cmake files first
+endif ()
+
+
+#
+# Import R3D targets
+#
+
+include("@CMAKE_INSTALL_PREFIX@/lib/cmake/r3d/r3dTargets.cmake")
