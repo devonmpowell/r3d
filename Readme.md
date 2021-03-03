@@ -27,26 +27,70 @@ lives in `deprecated`.
 - Utility functions for orientation tests, box initialization, conversion between polyhedral
   representations, and more.
 
-- A set of rigorous unit-tests, located in `tests`. These tests also serve as examples of how to
-  use `r3d`. 
+- A set of rigorous unit-tests, located in `src/tests`.
+These tests also serve as examples of how to use `r3d`. 
 
 - All declarations and documentation are located in `r3d.h`, `v3d.h`, `r2d.h`, and `v2d.h`.
 
+- For computational efficiency, R3D use a statically size array to
+  store vertices of 3D polyhedra. This defaults to 512 but can be
+  expanded or contracted by a CMake command line specification (`cmake
+  -DR3D_MAX_VERTS=N ..`). This autogenerates a config file
+  `r3d-config.h` at build time which is included in `r3d.h`. (Note: This makes it impossible to use a simple Makefile to compile R3D)
+
+
 ---
 
-### Usage:
+### Building:
 
-- To build, type
+-  Basic build
 
-`make`
+  `mkdir build`  # make a build directory
+  `cd build`
+  `cmake -DENABLE_UNIT_TESTS=ON ..`
+  `make`
+  `make test`    # to test if R3D is working correctly
 
-- To compile into your code,
 
-`#include <r3d.h>`, `#include <r2d.h>`, `#include <v3d.h>`, `#include <v2d.h>` as you require.
+-  CMake configuration options
 
-- To link,
+   Debug build:       `cmake -DCMAKE_BUILD_TYPE=Debug ..`
+   Release build:     `cmake -DCMAKE_BUILD_TYPE=Release ..`
+   Tests:             `cmake -DENABLE_UNIT_TESTS=[ON|OFF] ..`
+   Installation dir:  `cmake -DCMAKE_INSTALL_PREFIX=<r3d_install_dir> ..`
+   Set R3D_MAX_VERTS: `cmake -DR3D_MAX_VERTS=N ..` where N can be any number. 
 
-`-lr3d`
+- To link to R3D
+
+  - Using CMake
+  
+  R3D's build system now writes out relevant CMake configuration
+  information in `<r3d_install_dir>/lib/cmake/r3d/r3dConfig.cmake`. It
+  also exports a library target called `r3d::r3d` which can be
+  specified as a dependency and automatically get the locations of the
+  library, the name of the library (even if it is static or shared),
+  the locations of the include files etc.
+  
+  To use this method, call `find_package(r3d)` in the calling app's
+  CMake build system and specify `-Dr3d_ROOT=<r3d_install_dir>` in the
+  calling app's CMake command line invocation. Then specify `r3d` as a
+  dependency like so:
+  
+  `find_package(r3d)
+  target_link_libraries(MYAPP PRIVATE ${r3d_LIBRARIES})`
+  
+  
+  CMake will do the rest to find the includes and link in the right libraries.
+  
+  
+  - Manually
+
+	`#include <r3d.h>`, `#include <r2d.h>`, `#include <v3d.h>` etc. in your code as you require
+	
+	Point the build system to include path of the install directory
+	
+	Link to libr3d.a (or libr3d.so) as required (`-lr3d`)
+
 
 ---
 
