@@ -234,8 +234,7 @@ void test_moments() {
 	// TODO: just volume for now
 
 	// variables: the polyhedra and their moments
-	rNd_int i;
-	rNd_real tmp, tetvol;
+	rNd_real tetvol;
 	rNd_rvec verts[RND_DIM+1];
 	rNd_poly opoly;
 	rNd_real om[1];
@@ -273,7 +272,7 @@ void test_voxelization() {
 #define NGRID 17 
 
 	// vars
-	rNd_int i, j, k, v, curorder, mind;
+	rNd_int i, v;
 	rNd_long gg; 
 	rNd_int nmom = 1; //R3D_NUM_MOMENTS(POLY_ORDER);
 	rNd_real voxsum, tmom[nmom];
