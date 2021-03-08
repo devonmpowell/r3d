@@ -28,7 +28,7 @@ INC = -I$(R3D_HOME)
 LIB = -L$(R3D_HOME)
 
 # additional link flags
-LDFLAGS = -L$(R3D_HOME) -lr3d -lm
+LDFLAGS = -lr3d -lm
 
 # define the object files
 R3D_OBJ = $(R3D_SRC:.cc=.o)

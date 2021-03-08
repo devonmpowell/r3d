@@ -82,7 +82,7 @@ extern "C" {
  * 0 for constant (1 moment), 1 for linear (4 moments), 2 for quadratic (10 moments), etc.
  *
  */
-int r3d_voxelize(r3d_poly* poly, r3d_dvec3 ibox[2], r3d_real* dest_grid, r3d_rvec3 d, r3d_int polyorder);
+void r3d_voxelize(r3d_poly* poly, r3d_dvec3 ibox[2], r3d_real* dest_grid, r3d_rvec3 d, r3d_int polyorder);
 
 /**
  * \brief Get the minimal box of grid indices for a polyhedron, given a grid cell spacing,

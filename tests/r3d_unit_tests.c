@@ -88,13 +88,6 @@ void test_split_tets_thru_centroid() {
 		ASSERT_LT(m2[0], om[0]*(1.0 + TOL_FAIL));
 		EXPECT_LT(m2[0], om[0]*(1.0 + TOL_WARN));
 	}
-
-	for(i = 0; i < ntets; ++i) {
-                r3d_free(&opoly[i]);
-                r3d_free(&poly1[i]);
-                r3d_free(&poly2[i]);
-        }
-        
 }
 
 void test_split_nonconvex() {
@@ -111,7 +104,6 @@ void test_split_nonconvex() {
 	// explicitly create the nonconvex poly
 #define NZIGS 3
 #define ZOFF 0.1
-        r3d_init_blank(&opoly, 4*NZIGS);
 	opoly.nverts = 4*NZIGS;
 	for(v = 0; v < NZIGS; ++v) {
 		opoly.verts[v].pos.x = 1.0*v;
@@ -137,8 +129,8 @@ void test_split_nonconvex() {
 	}
 
 	// split along the x-axis (two single connected components this direction)
-        r3d_copy(&poly1, &opoly);
-        r3d_copy(&poly2, &opoly);
+	poly1 = opoly;
+	poly2 = opoly;
 	splane.n.x = 1.0;
 	splane.n.y = 0.0;
 	splane.n.z = 0.0;
@@ -160,12 +152,10 @@ void test_split_nonconvex() {
 	EXPECT_LT(m1[0], om[0]*(1.0 + TOL_WARN));
 	ASSERT_LT(m2[0], om[0]*(1.0 + TOL_FAIL));
 	EXPECT_LT(m2[0], om[0]*(1.0 + TOL_WARN));
-        r3d_free(&poly1);
-        r3d_free(&poly2);
-        
+
 	// split along the z-axis (two single connected components this direction)
-	r3d_copy(&poly1, &opoly);
-	r3d_copy(&poly2, &opoly);
+	poly1 = opoly;
+	poly2 = opoly;
 	splane.n.x = 0.0;
 	splane.n.y = 0.0;
 	splane.n.z = 1.0;
@@ -187,12 +177,10 @@ void test_split_nonconvex() {
 	EXPECT_LT(m1[0], om[0]*(1.0 + TOL_WARN));
 	ASSERT_LT(m2[0], om[0]*(1.0 + TOL_FAIL));
 	EXPECT_LT(m2[0], om[0]*(1.0 + TOL_WARN));
-        r3d_free(&poly1);
-        r3d_free(&poly2);
 
 	// split along the y-axis (multiple connected components this direction)
-	r3d_copy(&poly1, &opoly);
-	r3d_copy(&poly2, &opoly);
+	poly1 = opoly;
+	poly2 = opoly;
 	splane.n.x = 0.0;
 	splane.n.y = 1.0;
 	splane.n.z = 0.0;
@@ -214,10 +202,7 @@ void test_split_nonconvex() {
 	EXPECT_LT(m1[0], om[0]*(1.0 + TOL_WARN));
 	ASSERT_LT(m2[0], om[0]*(1.0 + TOL_FAIL));
 	EXPECT_LT(m2[0], om[0]*(1.0 + TOL_WARN));
-        r3d_free(&poly1);
-        r3d_free(&poly2);
 
-        r3d_free(&opoly);
 }
 
 
@@ -227,14 +212,14 @@ void test_recursive_splitting_nondegenerate() {
 	// checking to see that the resulting volumes add up properly.
 
 	// explicit stack-based implementation
-        r3d_int nstack, depth, t, m;
-        r3d_poly *polystack[STACK_SIZE];
+	r3d_int nstack, depth, t, m;
+	r3d_poly polystack[STACK_SIZE];
 	r3d_int depthstack[STACK_SIZE];
 
 	// variables: the polyhedra and their moments
 	r3d_rvec3 verts[4];
 	r3d_plane splane;
-	r3d_poly *opoly_p, *poly1_p, *poly2_p;
+	r3d_poly opoly, poly1, poly2;
 	r3d_real om[R3D_NUM_MOMENTS(POLY_ORDER)], m1[R3D_NUM_MOMENTS(POLY_ORDER)], m2[R3D_NUM_MOMENTS(POLY_ORDER)];
 
 	// do many trials
@@ -243,46 +228,42 @@ void test_recursive_splitting_nondegenerate() {
 
 		// generate a random tet
 		rand_tet_3d(verts, MIN_VOL);
-                opoly_p = (r3d_poly *) malloc(sizeof(r3d_poly));
-		r3d_init_tet(opoly_p, verts);
+		r3d_init_tet(&opoly, verts);
 	
 		// push the starting tet to the stack
 		nstack = 0;
-		polystack[nstack] = opoly_p;
+		polystack[nstack] = opoly;
 		depthstack[nstack] = 0;
-		++nstack;
+		++nstack;	
 	
 		// recursively split the poly
 		while(nstack > 0) {
 	
 			// pop the stack
 			--nstack;
-			opoly_p = polystack[nstack];
+			opoly = polystack[nstack];
 			depth = depthstack[nstack];
 	
 			// generate a randomly oriented plane
 			// through the centroid of the poly
-			splane = thru_cent_3d(opoly_p);
+			splane = thru_cent_3d(&opoly);
 
 			// split the poly by making two copies of the original poly
 			// and them clipping them against the same plane, with one
 			// oriented oppositely
-                        poly1_p = (r3d_poly *) malloc(sizeof(r3d_poly));
-			r3d_copy(poly1_p, opoly_p);
-                        poly2_p = (r3d_poly *) malloc(sizeof(r3d_poly));
-			r3d_copy(poly2_p, opoly_p);
-
-			r3d_clip(poly1_p, &splane, 1);
+			poly1 = opoly;
+			poly2 = opoly;
+			r3d_clip(&poly1, &splane, 1);
 			splane.n.x *= -1;
 			splane.n.y *= -1;
 			splane.n.z *= -1;
 			splane.d *= -1;
-			r3d_clip(poly2_p, &splane, 1);
+			r3d_clip(&poly2, &splane, 1);
 
 			// reduce the original and its two parts
-			r3d_reduce(opoly_p, om, POLY_ORDER);
-			r3d_reduce(poly1_p, m1, POLY_ORDER);
-			r3d_reduce(poly2_p, m2, POLY_ORDER);
+			r3d_reduce(&opoly, om, POLY_ORDER);
+			r3d_reduce(&poly1, m1, POLY_ORDER);
+			r3d_reduce(&poly2, m2, POLY_ORDER);
 
 			// make sure the sum of moments equals the original 
 			for(m = 0; m < R3D_NUM_MOMENTS(POLY_ORDER); ++m) {
@@ -304,30 +285,16 @@ void test_recursive_splitting_nondegenerate() {
 			// an acceptably large volume
 			if(depth < MAX_DEPTH) {
 				if(m1[0] > MIN_VOL) {
-                                        polystack[nstack] = poly1_p;
+					polystack[nstack] = poly1;
 					depthstack[nstack] = depth + 1;
-					++nstack;
-				} else {
-					r3d_free(poly1_p);
-					free(poly1_p);
+					++nstack;	
 				}
 				if(m2[0] > MIN_VOL) {
-                                        polystack[nstack] = poly2_p;
+					polystack[nstack] = poly2;
 					depthstack[nstack] = depth + 1;
-					++nstack;
-				} else {
-					r3d_free(poly2_p);
-					free(poly2_p);
+					++nstack;	
 				}
-			} else {
-                                r3d_free(poly1_p);
-                                free(poly1_p);
-                                r3d_free(poly2_p);
-                                free(poly2_p);
-                        }
-                        r3d_free(opoly_p);
-                        free(opoly_p);
-
+			}
 		}
 	}
 }
@@ -339,14 +306,14 @@ void test_recursive_splitting_degenerate() {
 	// checking to see that the resulting volumes add up properly.
 
 	// explicit stack-based implementation
-        r3d_int nstack, depth, t, chopt, m;
-	r3d_poly *polystack[STACK_SIZE];
+	r3d_int nstack, depth, t, chopt, m;
+	r3d_poly polystack[STACK_SIZE];
 	r3d_int depthstack[STACK_SIZE];
 
 	// variables: the polyhedra and their moments
 	r3d_rvec3 verts[4];
 	r3d_plane splane;
-	r3d_poly *opoly_p, *poly1_p, *poly2_p;
+	r3d_poly opoly, poly1, poly2;
 	r3d_real om[R3D_NUM_MOMENTS(POLY_ORDER)], m1[R3D_NUM_MOMENTS(POLY_ORDER)], m2[R3D_NUM_MOMENTS(POLY_ORDER)];
 
 	// do many trials
@@ -355,12 +322,11 @@ void test_recursive_splitting_degenerate() {
 
 		// generate a random tet
 		rand_tet_3d(verts, MIN_VOL);
-		opoly_p = (r3d_poly *) malloc(sizeof(r3d_poly));
-		r3d_init_tet(opoly_p, verts);
+		r3d_init_tet(&opoly, verts);
 	
 		// push the starting tet to the stack
 		nstack = 0;
-		polystack[nstack] = opoly_p;
+		polystack[nstack] = opoly;
 		depthstack[nstack] = 0;
 		++nstack;	
 	
@@ -369,7 +335,7 @@ void test_recursive_splitting_degenerate() {
 	
 			// pop the stack
 			--nstack;
-			opoly_p = polystack[nstack];
+			opoly = polystack[nstack];
 			depth = depthstack[nstack];
 	
 			// generate a random plane from one of a few
@@ -377,28 +343,25 @@ void test_recursive_splitting_degenerate() {
 			// has a valid unit normal
 			chopt = rand_int(6);
 			do {
-				splane = choptions_3d[chopt](opoly_p);
+				splane = choptions_3d[chopt](&opoly);
 			} while(splane.n.x == 0.0 && splane.n.y == 0.0 && splane.n.z == 0.0);
 
 			// split the poly by making two copies of the original poly
 			// and them clipping them against the same plane, with one
 			// oriented oppositely
-			poly1_p = (r3d_poly *) malloc(sizeof(r3d_poly));
-			r3d_copy(poly1_p, opoly_p);
-			poly2_p = (r3d_poly *) malloc(sizeof(r3d_poly));
-			r3d_copy(poly2_p, opoly_p);
-
-			r3d_clip(poly1_p, &splane, 1);
+			poly1 = opoly;
+			poly2 = opoly;
+			r3d_clip(&poly1, &splane, 1);
 			splane.n.x *= -1;
 			splane.n.y *= -1;
 			splane.n.z *= -1;
 			splane.d *= -1;
-			r3d_clip(poly2_p, &splane, 1);
+			r3d_clip(&poly2, &splane, 1);
 
 			// reduce the original and its two parts
-			r3d_reduce(opoly_p, om, POLY_ORDER);
-			r3d_reduce(poly1_p, m1, POLY_ORDER);
-			r3d_reduce(poly2_p, m2, POLY_ORDER);
+			r3d_reduce(&opoly, om, POLY_ORDER);
+			r3d_reduce(&poly1, m1, POLY_ORDER);
+			r3d_reduce(&poly2, m2, POLY_ORDER);
 		
 			// make sure the sum of moments equals the original 
 			for(m = 0; m < R3D_NUM_MOMENTS(POLY_ORDER); ++m) {
@@ -420,29 +383,16 @@ void test_recursive_splitting_degenerate() {
 			// an acceptably large volume
 			if(depth < MAX_DEPTH) {
 				if(m1[0] > MIN_VOL) {
-					polystack[nstack] = poly1_p;
+					polystack[nstack] = poly1;
 					depthstack[nstack] = depth + 1;
 					++nstack;	
-				} else {
-					r3d_free(poly1_p);
-					free(poly1_p);
 				}
 				if(m2[0] > MIN_VOL) {
-					polystack[nstack] = poly2_p;
+					polystack[nstack] = poly2;
 					depthstack[nstack] = depth + 1;
 					++nstack;	
-				} else {
-					r3d_free(poly2_p);
-					free(poly2_p);
 				}
-			} else {
-                                r3d_free(poly1_p);
-                                free(poly1_p);
-                                r3d_free(poly2_p);
-                                free(poly2_p);
-                        }
-                        r3d_free(opoly_p);
-                        free(opoly_p);
+			}
 		}
 	}
 }
@@ -459,13 +409,13 @@ void test_recursive_splitting_degenerate_perturbed() {
 
 	// explicit stack-based implementation
 	r3d_int nstack, depth, t, chopt, m;
-	r3d_poly *polystack[STACK_SIZE];
+	r3d_poly polystack[STACK_SIZE];
 	r3d_int depthstack[STACK_SIZE];
 
 	// variables: the polyhedra and their moments
 	r3d_rvec3 verts[4];
 	r3d_plane splane;
-	r3d_poly *opoly_p, *poly1_p, *poly2_p;
+	r3d_poly opoly, poly1, poly2;
 	r3d_real om[R3D_NUM_MOMENTS(POLY_ORDER)], m1[R3D_NUM_MOMENTS(POLY_ORDER)], m2[R3D_NUM_MOMENTS(POLY_ORDER)];
 	r3d_real perturb;
 
@@ -480,12 +430,11 @@ void test_recursive_splitting_degenerate_perturbed() {
 
 		// generate a random tet
 		rand_tet_3d(verts, MIN_VOL);
-		opoly_p = (r3d_poly *) malloc(sizeof(r3d_poly));
-		r3d_init_tet(opoly_p, verts);
+		r3d_init_tet(&opoly, verts);
 	
 		// push the starting tet to the stack
 		nstack = 0;
-		polystack[nstack] = opoly_p;
+		polystack[nstack] = opoly;
 		depthstack[nstack] = 0;
 		++nstack;	
 	
@@ -494,7 +443,7 @@ void test_recursive_splitting_degenerate_perturbed() {
 	
 			// pop the stack
 			--nstack;
-			opoly_p = polystack[nstack];
+			opoly = polystack[nstack];
 			depth = depthstack[nstack];
 	
 			// generate a random plane from one of a few
@@ -502,7 +451,7 @@ void test_recursive_splitting_degenerate_perturbed() {
 			// has a valid unit normal
 			chopt = rand_int(6);
 			do {
-				splane = choptions_3d[chopt](opoly_p);
+				splane = choptions_3d[chopt](&opoly);
 			} while(splane.n.x == 0.0 && splane.n.y == 0.0 && splane.n.z == 0.0);
 
 			// randomly perturb the plane
@@ -514,22 +463,19 @@ void test_recursive_splitting_degenerate_perturbed() {
 			// split the poly by making two copies of the original poly
 			// and them clipping them against the same plane, with one
 			// oriented oppositely
-			poly1_p = (r3d_poly *) malloc(sizeof(r3d_poly));
-			r3d_copy(poly1_p, opoly_p);
-			poly2_p = (r3d_poly *) malloc(sizeof(r3d_poly));
-			r3d_copy(poly2_p, opoly_p);
-
-			r3d_clip(poly1_p, &splane, 1);
+			poly1 = opoly;
+			poly2 = opoly;
+			r3d_clip(&poly1, &splane, 1);
 			splane.n.x *= -1;
 			splane.n.y *= -1;
 			splane.n.z *= -1;
 			splane.d *= -1;
-			r3d_clip(poly2_p, &splane, 1);
+			r3d_clip(&poly2, &splane, 1);
 
 			// reduce the original and its two parts
-			r3d_reduce(opoly_p, om, POLY_ORDER);
-			r3d_reduce(poly1_p, m1, POLY_ORDER);
-			r3d_reduce(poly2_p, m2, POLY_ORDER);
+			r3d_reduce(&opoly, om, POLY_ORDER);
+			r3d_reduce(&poly1, m1, POLY_ORDER);
+			r3d_reduce(&poly2, m2, POLY_ORDER);
 			
 			// make sure the sum of moments equals the original 
 			for(m = 0; m < R3D_NUM_MOMENTS(POLY_ORDER); ++m) {
@@ -551,29 +497,16 @@ void test_recursive_splitting_degenerate_perturbed() {
 			// an acceptably large volume
 			if(depth < MAX_DEPTH) {
 				if(m1[0] > MIN_VOL) {
-					polystack[nstack] = poly1_p;
+					polystack[nstack] = poly1;
 					depthstack[nstack] = depth + 1;
 					++nstack;	
-				} else {
-					r3d_free(poly1_p);
-					free(poly1_p);
 				}
 				if(m2[0] > MIN_VOL) {
-					polystack[nstack] = poly2_p;
+					polystack[nstack] = poly2;
 					depthstack[nstack] = depth + 1;
 					++nstack;	
-				} else {
-					r3d_free(poly2_p);
-					free(poly2_p);
 				}
-			} else {
-                                r3d_free(poly1_p);
-                                free(poly1_p);
-                                r3d_free(poly2_p);
-                                free(poly2_p);
-                        }
-                        r3d_free(opoly_p);
-                        free(opoly_p);
+			}
 		}
 	}
 }
@@ -612,7 +545,6 @@ void test_tet_tet_timing() {
 		// find the moments (up to quadratic order) of the clipped poly
 		r3d_reduce(&poly, om, POLY_ORDER);
 
-                r3d_free(&poly);
 	}
 }
 
@@ -629,12 +561,12 @@ void test_torus_load_and_chop() {
 
 	// explicit stack-based implementation
 	r3d_int nstack, depth, chopt;
-	r3d_poly *polystack[STACK_SIZE];
+	r3d_poly polystack[STACK_SIZE];
 	r3d_int depthstack[STACK_SIZE];
 
 	// variables: the polyhedra and their moments
 	r3d_plane splane;
-	r3d_poly *opoly_p, *poly1_p, *poly2_p;
+	r3d_poly opoly, poly1, poly2;
 	r3d_real om[R3D_NUM_MOMENTS(POLY_ORDER)], m1[R3D_NUM_MOMENTS(POLY_ORDER)], m2[R3D_NUM_MOMENTS(POLY_ORDER)];
 	
 	// torus parameters
@@ -696,12 +628,11 @@ void test_torus_load_and_chop() {
 	for(f = 0; f < nfaces; ++f) faceinds[f] = &rawinds[f][0];
 
 	// initialize a general polyhedron
-	opoly_p = (r3d_poly *) malloc(sizeof(r3d_poly));
-	r3d_init_poly(opoly_p, vertices, nverts, faceinds, vertsperface, nfaces);
+	r3d_init_poly(&opoly, vertices, nverts, faceinds, vertsperface, nfaces);
 
 	// push the torus to the stack
 	nstack = 0;
-	polystack[nstack] = opoly_p;
+	polystack[nstack] = opoly;
 	depthstack[nstack] = 0;
 	++nstack;	
 
@@ -710,7 +641,7 @@ void test_torus_load_and_chop() {
 
 		// pop the stack
 		--nstack;
-		opoly_p = polystack[nstack];
+		opoly = polystack[nstack];
 		depth = depthstack[nstack];
 
 		// generate a random plane from one of a few
@@ -718,28 +649,25 @@ void test_torus_load_and_chop() {
 		// has a valid unit normal
 		chopt = rand_int(6);
 		do {
-			splane = choptions_3d[chopt](opoly_p);
+			splane = choptions_3d[chopt](&opoly);
 		} while(splane.n.x == 0.0 && splane.n.y == 0.0 && splane.n.z == 0.0);
 
 		// split the poly by making two copies of the original poly
 		// and them clipping them against the same plane, with one
 		// oriented oppositely
-		poly1_p = (r3d_poly *) malloc(sizeof(r3d_poly));
-		r3d_copy(poly1_p, opoly_p);
-		poly2_p = (r3d_poly *) malloc(sizeof(r3d_poly));
-		r3d_copy(poly2_p, opoly_p);
-
-		r3d_clip(poly1_p, &splane, 1);
+		poly1 = opoly;
+		poly2 = opoly;
+		r3d_clip(&poly1, &splane, 1);
 		splane.n.x *= -1;
 		splane.n.y *= -1;
 		splane.n.z *= -1;
 		splane.d *= -1;
-		r3d_clip(poly2_p, &splane, 1);
+		r3d_clip(&poly2, &splane, 1);
 
 		// reduce the original and its two parts
-		r3d_reduce(opoly_p, om, POLY_ORDER);
-		r3d_reduce(poly1_p, m1, POLY_ORDER);
-		r3d_reduce(poly2_p, m2, POLY_ORDER);
+		r3d_reduce(&opoly, om, POLY_ORDER);
+		r3d_reduce(&poly1, m1, POLY_ORDER);
+		r3d_reduce(&poly2, m2, POLY_ORDER);
 	
 		// make sure the sum of moments equals the original 
 		for(m = 0; m < R3D_NUM_MOMENTS(POLY_ORDER); ++m) {
@@ -761,29 +689,16 @@ void test_torus_load_and_chop() {
 		// an acceptably large volume
 		if(depth < MAX_DEPTH) {
 			if(m1[0] > MIN_VOL) {
-				polystack[nstack] = poly1_p;
+				polystack[nstack] = poly1;
 				depthstack[nstack] = depth + 1;
 				++nstack;	
-			} else {
-				r3d_free(poly1_p);
-				free(poly1_p);
 			}
 			if(m2[0] > MIN_VOL) {
-				polystack[nstack] = poly2_p;
+				polystack[nstack] = poly2;
 				depthstack[nstack] = depth + 1;
 				++nstack;	
-			} else {
-				r3d_free(poly2_p);
-				free(poly2_p);
 			}
-		} else {
-                        r3d_free(poly1_p);
-                        free(poly1_p);
-                        r3d_free(poly2_p);
-                        free(poly2_p);
-                }
-                r3d_free(opoly_p);
-                free(opoly_p);
+		}
 	}
 }
 
@@ -841,8 +756,6 @@ void test_voxelization() {
 		}
 	}
 	free(grid);
-
-        r3d_free(&poly);
 }
 
 
@@ -896,23 +809,21 @@ void test_moments() {
 		}
 	}
 
-        r3d_free(&poly);
-
 }
 
 // -- user-implemented functions declared in utest.h -- //
 
 void register_all_tests() {
 
-        register_test(test_split_tets_thru_centroid, "split_tets_thru_centroid");
-        register_test(test_split_nonconvex, "split_nonconvex");
-     	register_test(test_recursive_splitting_nondegenerate, "recursive_splitting_nondegenerate");
-    	register_test(test_recursive_splitting_degenerate, "recursive_splitting_degenerate");
-    	register_test(test_recursive_splitting_degenerate_perturbed, "recursive_splitting_degenerate_perturbed");
-    	register_test(test_tet_tet_timing, "tet_tet_timing");
-    	register_test(test_torus_load_and_chop, "torus_load_and_chop");
-  	register_test(test_moments, "moments");
-  	register_test(test_voxelization, "voxelization");
+	register_test(test_split_tets_thru_centroid, "split_tets_thru_centroid");
+	register_test(test_split_nonconvex, "split_nonconvex");
+	register_test(test_recursive_splitting_nondegenerate, "recursive_splitting_nondegenerate");
+	register_test(test_recursive_splitting_degenerate, "recursive_splitting_degenerate");
+	register_test(test_recursive_splitting_degenerate_perturbed, "recursive_splitting_degenerate_perturbed");
+	register_test(test_tet_tet_timing, "tet_tet_timing");
+	register_test(test_torus_load_and_chop, "torus_load_and_chop");
+	register_test(test_moments, "moments");
+	register_test(test_voxelization, "voxelization");
 
 }
 
