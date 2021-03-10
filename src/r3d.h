@@ -25,6 +25,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "r3d-config.h"  /* Defines R3D_MAX_VERTS. auto-generated at compile time */
+
 /**
  * \file r3d.h \author Devon Powell \date 31 August 2015 \brief Interface for
  * r3d
@@ -93,7 +95,6 @@ typedef struct
  */
 typedef struct
 {
-#define R3D_MAX_VERTS 512
   r3d_vertex verts[R3D_MAX_VERTS]; /*!< Vertex buffer. */
   r3d_int nverts;                  /*!< Number of vertices in the buffer. */
 } r3d_poly;
