@@ -392,7 +392,7 @@ int main() {
 
 	// get the volume
 	r3d_real volume;
-	r3d_reduce(&poly, &volume, 1);
+	r3d_reduce(&poly, &volume, 0);
 
 	std::cout << "poly is good: " << r3d_is_good(&poly) 
 		<< " and has volume " << volume << std::endl << std::endl;
@@ -408,7 +408,7 @@ int main() {
 	r3d_clip(&poly, &p1, 1);
 
 	// get the volume
-	r3d_reduce(&poly, &volume, 1);
+	r3d_reduce(&poly, &volume, 0);
 
 	std::cout << "clipped poly is good: " << r3d_is_good(&poly)
 		<< " and has volume " << volume << std::endl << std::endl;
@@ -469,13 +469,13 @@ int main() {
 
 	r3d_init_poly(&poly, vertices, nvertices, faceinds, numvertsperface, nfaces);
 
-	std::cout << std::endl << "input poly" << std::endl;
-	r3d_print(&poly);
-	std::cout << std::endl;
+        std::cout << std::endl << "input poly" << std::endl;
+        r3d_print(&poly);
+        std::cout << std::endl;
 
 	// get the volume
-	r3d_real volume;
-	r3d_reduce(&poly, &volume, 1);
+        r3d_real volume;
+        r3d_reduce(&poly, &volume, 0);
 
 	std::cout << "poly is good: " << r3d_is_good(&poly) << " and has volume "
 		<< volume << std::endl << std::endl;
@@ -491,7 +491,7 @@ int main() {
 	r3d_clip(&poly, &p1, 1);
 
 	// get the volume
-	r3d_reduce(&poly, &volume, 1);
+	r3d_reduce(&poly, &volume, 0);
 
 	std::cout << std::endl << "clipped poly is good: " << r3d_is_good(&poly)
 		<< " and has volume " << volume << std::endl << std::endl;
@@ -690,7 +690,7 @@ int main() {
 
 	// get the volume
 	r3d_real volume;
-	r3d_reduce(&poly, &volume, 1);
+	r3d_reduce(&poly, &volume, 0);
 
 	std::cout << "\nclipped poly is good: " << r3d_is_good(&poly)
 		<< " and has volume " << volume << std::endl << std::endl;
