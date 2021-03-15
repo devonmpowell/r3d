@@ -7,18 +7,19 @@ extern "C" {
 }
 
 int main() {
-#if 0
 
+#if 0
+  {
 	//////////////////////////////////////////
 	// make sure we have a working program
 	//////////////////////////////////////////
 
 	std::cout << "hello world" << std::endl;
-
+  }
 #endif
 
 #if 0
-
+  {
 	//////////////////////////////////////////
 	// vectors
 	//////////////////////////////////////////
@@ -28,11 +29,11 @@ int main() {
 
 	std::cout << "v indexed " << v.xyz[0] << " " << v.xyz[1] << " " 
 		<< v.xyz[2] << " " << std::endl;
-
+  }
 #endif
 
 #if 0
-
+  {
 	//////////////////////////////////////////
 	// planes
 	//////////////////////////////////////////
@@ -48,11 +49,11 @@ int main() {
 	r3d_plane plane2 = {{2., 2., 3.}, 1.};
 	std::cout << "plane 2 " << plane2.n.xyz[0] << " " << plane2.n.xyz[1] 
 		<< " " << plane2.n.xyz[2] << " " << std::endl;
-
+  }
 #endif
 
 #if 0
-
+  {
 	//////////////////////////////////////////
 	// vertices, It is unlikely we will ever call this directly. It is created
 	// automatically by helper functions like r3d_init_tet
@@ -61,10 +62,11 @@ int main() {
 	r3d_vertex vertex = {{0, 1., 2}, {5., 6., 7.}};
 	std::cout << "vertex " << vertex.pos.x << " " << vertex.pos.y << " "
 		<< vertex.pos.z << " " << std::endl;
-
+  }
 #endif
 
-#if 0
+  {
+          
 	//////////////////////////////////////////
 	// tetrahedron, test clip
 	//////////////////////////////////////////
@@ -102,9 +104,9 @@ int main() {
 	r3d_print_brep(&brep, numcomponents);
 	r3d_free_brep(&brep, numcomponents);
 
-#endif
+  }
 
-#if 0
+  {
 
 	//////////////////////////////////////////
 	// tetrahedron, test split
@@ -141,9 +143,9 @@ int main() {
 	std::cout << "neg" << std::endl;
 	r3d_print(&out_neg);
 
-#endif
+  }
 
-#if 0
+  {
 
 	//////////////////////////////////////////
 	// make a cube, the easiest way is to make a bound box
@@ -169,9 +171,9 @@ int main() {
 	r3d_print_brep(&brep, numcomponents);
 	r3d_free_brep(&brep, numcomponents);
 
-#endif
+  }
 
-#if 0
+  {
 
 	//////////////////////////////////////////
 	// make a cube, using the r3d_init_poly interface
@@ -217,9 +219,9 @@ int main() {
 	r3d_print_brep(&brep, numcomponents);
 	r3d_free_brep(&brep, numcomponents);
 
-#endif
+  }
 
-#if 0
+  {
 
 	//////////////////////////////////////////
 	// make a cube, using the r3d_poly interface with list initialization and
@@ -273,9 +275,9 @@ int main() {
 	r3d_print_brep(&brep, numcomponents);
 	r3d_free_brep(&brep, numcomponents);
 
-#endif
+  }
 
-#if 0
+  {
 
 	//////////////////////////////////////////
 	// cube, test split
@@ -326,9 +328,9 @@ int main() {
 	r3d_print_brep(&brep, numcomponents);
 	r3d_free_brep(&brep, numcomponents);
 
-#endif
+  }
 
-#if 0
+  {
 
 	//////////////////////////////////////////
 	// make a double cube and intersect with a plane so it cuts both cubes
@@ -419,9 +421,9 @@ int main() {
 	r3d_print_brep(&brep, numcomponents);
 	r3d_free_brep(&brep, numcomponents);
 
-#endif
+  }
 
-#if 0
+  {
 
 	//////////////////////////////////////////
 	// make a dimpled cube
@@ -502,9 +504,9 @@ int main() {
 	r3d_print_brep(&brep, numcomponents);
 	r3d_free_brep(&brep, numcomponents);
 
-#endif
+  }
 
-#if 0
+  {
 
 	//////////////////////////////////////////
 	// make a pyramid with an octagonal base
@@ -560,9 +562,9 @@ int main() {
 	r3d_print_brep(&brep, numcomponents);
 	r3d_free_brep(&brep, numcomponents);
 
-#endif
+  }
 
-#if 0
+  {
 
 	//////////////////////////////////////////
 	// make a double pyramid with an octagonal center
@@ -625,32 +627,32 @@ int main() {
 	r3d_print_brep(&brep, numcomponents);
 	r3d_free_brep(&brep, numcomponents);
 
-#endif
+  }
 
-#if 1
+  {
 
-	//////////////////////////////////////////
-	// make a topological cube with a non-planar top
-	// cut the cube with a plane whose normal is the z axis
-	// if offset is negative the clipped polyhedron should
-	// have 2 components (tetrahedrons)
-	//////////////////////////////////////////
+        //////////////////////////////////////////
+        // make a topological cube with a non-planar top
+        // cut the cube with a plane whose normal is the z axis
+        // if offset is negative the clipped polyhedron should
+        // have 2 components (tetrahedrons)
+        //////////////////////////////////////////
 
-	const r3d_real offset = -1.;	// theoretical volume is 1+dimple/3
+        const r3d_real offset = -1.;	// theoretical volume is 1+dimple/3
 
-	// start with raw vertices
-	r3d_rvec3 vertices[8] = {
-		{0., 0., 0.}, 
-		{1., 0., 0.}, 
-		{1., 1., 0.}, 
-		{0., 1., 0.},
-		{0., 0., 1.}, 
-		{1., 0., 1. + offset}, 
-		{1., 1., 1.}, 
-		{0., 1., 1. + offset},
-	};
+        // start with raw vertices
+        r3d_rvec3 vertices[8] = {
+                {0., 0., 0.}, 
+                {1., 0., 0.}, 
+                {1., 1., 0.}, 
+                {0., 1., 0.},
+                {0., 0., 1.}, 
+                {1., 0., 1. + offset}, 
+                {1., 1., 1.}, 
+                {0., 1., 1. + offset},
+        };
 
-	r3d_int nvertices = 8, nfaces = 6;
+        r3d_int nvertices = 8, nfaces = 6;
 
 	// define connectivity
 	std::vector<std::vector<r3d_int>> rawinds = {
@@ -701,7 +703,7 @@ int main() {
 	r3d_print_brep(&brep, numcomponents);
 	r3d_free_brep(&brep, numcomponents);
 
-#endif
-
-	return 0;
+  }
+  
+  return 0;
 }
