@@ -247,7 +247,7 @@ int r3d_split(r3d_poly *inpolys, r3d_int npolys, r3d_plane plane,
 				outpolys[1]->verts[v].pnbrs[np] = side[outpolys[1]->verts[v].pnbrs[np]];
 	}
 
-        return 0;
+        return 1;
 }
 
 void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
