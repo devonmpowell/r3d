@@ -267,11 +267,11 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
 
 	if (*nverts <= 0) return;
 
-	// flag to translate a polyhedron to the origin for increased accuracy
+#ifdef SHIFT_POLY
+	// translate a polyhedron to the origin for increased accuracy
 	// (this will increase computational cost, in particular for higher moments)
-	r3d_int shift_poly = 1;
-
-	if(shift_poly) vc = r3d_poly_center(poly);
+	vc = r3d_poly_center(poly);
+#endif
 
 	// for keeping track of which edges have been visited
 	r3d_int emarks[*nverts][3];
@@ -298,11 +298,11 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
 			vnext = vertbuffer[vcur].pnbrs[pnext];
 			v0 = vertbuffer[vcur].pos;
 
-			if(shift_poly) {
-				v0.x = v0.x - vc.x;
-				v0.y = v0.y - vc.y;
-				v0.z = v0.z - vc.z;
-			}
+#ifdef SHIFT_POLY
+			v0.x = v0.x - vc.x;
+			v0.y = v0.y - vc.y;
+			v0.z = v0.z - vc.z;
+#endif
 
 			// move to the second edge
 			for (np = 0; np < 3; ++np)
@@ -317,14 +317,14 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
 				v2 = vertbuffer[vcur].pos;
 				v1 = vertbuffer[vnext].pos;
 
-				if(shift_poly) {
-					v2.x = v2.x - vc.x;
-					v2.y = v2.y - vc.y;
-					v2.z = v2.z - vc.z;
-					v1.x = v1.x - vc.x;
-					v1.y = v1.y - vc.y;
-					v1.z = v1.z - vc.z;
-				}
+#ifdef SHIFT_POLY
+				v2.x = v2.x - vc.x;
+				v2.y = v2.y - vc.y;
+				v2.z = v2.z - vc.z;
+				v1.x = v1.x - vc.x;
+				v1.y = v1.y - vc.y;
+				v1.z = v1.z - vc.z;
+#endif
 
 				sixv = (-v2.x * v1.y * v0.z + v1.x * v2.y * v0.z + v2.x * v0.y * v1.z -
 								v0.x * v2.y * v1.z - v1.x * v0.y * v2.z + v0.x * v1.y * v2.z);
@@ -396,8 +396,9 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
 		prevlayer = 1 - prevlayer;
 	}
 
-	if(shift_poly) r3d_shift_moments(moments, polyorder, vc);
-
+#ifdef SHIFT_POLY
+	r3d_shift_moments(moments, polyorder, vc);
+#endif
 }
 
 void r3d_shift_moments(r3d_real* moments, r3d_int polyorder, r3d_rvec3 vc) {

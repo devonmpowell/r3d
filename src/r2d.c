@@ -242,11 +242,11 @@ void r2d_reduce(r2d_poly* poly, r2d_real* moments, r2d_int polyorder) {
 
 	if(*nverts <= 0) return;
 
-	// flag to translate a polygon to the origin for increased accuracy
+#ifdef SHIFT_POLY
+	// translate a polygon to the origin for increased accuracy
 	// (this will increase computational cost, in particular for higher moments)
-	r2d_int shift_poly = 1;
-
-	if(shift_poly) vc = r2d_poly_center(poly);
+	vc = r2d_poly_center(poly);
+#endif
 
 	// Storage for coefficients
 	// keep two layers of the triangle of coefficients
@@ -262,12 +262,12 @@ void r2d_reduce(r2d_poly* poly, r2d_real* moments, r2d_int polyorder) {
 		v0 = vertbuffer[vcur].pos;
 		v1 = vertbuffer[vnext].pos;
 
-		if(shift_poly) {
-			v0.x = v0.x - vc.x;
-			v0.y = v0.y - vc.y;
-			v1.x = v1.x - vc.x;
-			v1.y = v1.y - vc.y;
-		}
+#ifdef SHIFT_POLY
+		v0.x = v0.x - vc.x;
+		v0.y = v0.y - vc.y;
+		v1.x = v1.x - vc.x;
+		v1.y = v1.y - vc.y;
+#endif
 
 		twoa = (v0.x*v1.y - v0.y*v1.x);
 
@@ -316,8 +316,9 @@ void r2d_reduce(r2d_poly* poly, r2d_real* moments, r2d_int polyorder) {
 		prevlayer = 1 - prevlayer;
 	}
 
-	if(shift_poly) r2d_shift_moments(moments, polyorder, vc);
-
+#ifdef SHIFT_POLY
+	r2d_shift_moments(moments, polyorder, vc);
+#endif
 }
 
 void r2d_shift_moments(r2d_real* moments, r2d_int polyorder, r2d_rvec2 vc) {
