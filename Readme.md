@@ -46,18 +46,26 @@ These tests also serve as examples of how to use `r3d`.
 -  Basic build
 
   `mkdir build`  # make a build directory
+
   `cd build`
+
   `cmake -DENABLE_UNIT_TESTS=ON ..`
+
   `make`
+
   `make test`    # to test if R3D is working correctly
 
 
 -  CMake configuration options
 
    Debug build:       `cmake -DCMAKE_BUILD_TYPE=Debug ..`
+
    Release build:     `cmake -DCMAKE_BUILD_TYPE=Release ..`
+
    Tests:             `cmake -DENABLE_UNIT_TESTS=[ON|OFF] ..`
+
    Installation dir:  `cmake -DCMAKE_INSTALL_PREFIX=<r3d_install_dir> ..`
+
    Set R3D_MAX_VERTS: `cmake -DR3D_MAX_VERTS=N ..` where N can be any number. 
 
 - To link to R3D
