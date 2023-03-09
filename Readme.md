@@ -43,17 +43,17 @@ These tests also serve as examples of how to use `r3d`.
 
 ### Building:
 
--  Basic build
+-   Basic build
 
-  `mkdir build`  # make a build directory
-
-  `cd build`
-
-  `cmake -DENABLE_UNIT_TESTS=ON ..`
-
-  `make`
-
-  `make test`    # to test if R3D is working correctly
+   `mkdir build`  # make a build directory
+ 
+   `cd build`
+ 
+   `cmake -DENABLE_UNIT_TESTS=ON ..`
+ 
+   `make`
+ 
+   `make test`    # to test if R3D is working correctly
 
 
 -  CMake configuration options
