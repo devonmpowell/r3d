@@ -6,4 +6,6 @@
 
 #define R3D_MAX_VERTS @R3D_MAX_VERTS@
 
+#define SHIFT_POLY @SHIFT_POLY@
+
 #endif

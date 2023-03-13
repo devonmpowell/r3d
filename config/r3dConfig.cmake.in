@@ -17,6 +17,8 @@ set(r3d_INCLUDE_DIR @CMAKE_INSTALL_PREFIX@/include CACHE PATH "R3D include file 
 # R3D options
 set(R3D_MAX_VERTS @R3D_MAX_VERTS@ CACHE STRING "Max verts in R3D polyhedron")
 
+set(SHIFT_POLY @SHIFT_POLY@ CACHE STRING "Enable shifting of polytops for moment calculation")
+
 #
 # Import R3D targets
 #
