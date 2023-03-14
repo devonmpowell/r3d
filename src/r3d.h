@@ -22,6 +22,10 @@
 #ifndef _R3D_H_
 #define _R3D_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -426,5 +430,9 @@ void r3d_print_brep(r3d_brep **brep, r3d_int numcomponents);
  * 
  */
 void r3d_free_brep(r3d_brep **brep, r3d_int numcomponents);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _R3D_H_
