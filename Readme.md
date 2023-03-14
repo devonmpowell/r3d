@@ -38,6 +38,10 @@ These tests also serve as examples of how to use `r3d`.
   -DR3D_MAX_VERTS=N ..`). This autogenerates a config file
   `r3d-config.h` at build time which is included in `r3d.h`. (Note: This makes it impossible to use a simple Makefile to compile R3D)
 
+- To improve accuracy of moment calculations, polytops can be shifted to the origin by
+  setting -DSHIFT_POLY=True in CMake configuration options. This option is particularly
+  beneficial for small polytops located far from the origin, but it is computationally
+  costly for high-order moments.
 
 ---
 
