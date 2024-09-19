@@ -176,8 +176,8 @@ r3d_rvec3 get_centroid_3d(r3d_poly* poly) {
 	r3d_int v;
 	for(v = 0; v < poly->nverts; ++v) {
 		centroid.x += poly->verts[v].pos.x;
-		centroid.x += poly->verts[v].pos.y;
-		centroid.x += poly->verts[v].pos.z;
+		centroid.y += poly->verts[v].pos.y;
+		centroid.z += poly->verts[v].pos.z;
 	}
 	centroid.x /= poly->nverts;
 	centroid.y /= poly->nverts;
